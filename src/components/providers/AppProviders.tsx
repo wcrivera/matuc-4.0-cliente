@@ -54,9 +54,9 @@ export function AppProviders({ children }: AppProvidersProps) {
         <QueryClientProvider client={client}>
             <ThemeInitializer>
                 <ToastProvider position="top-right">
-                    <AuthProvider>
+                    {/* <AuthProvider> */}
                         {children}
-                    </AuthProvider>
+                    {/* </AuthProvider> */}
                 </ToastProvider>
             </ThemeInitializer>
         </QueryClientProvider>
