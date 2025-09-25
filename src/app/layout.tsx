@@ -2,6 +2,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import { AppProviders } from '@/components/providers'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -10,6 +11,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://matuc.uc.cl'),
   title: 'MATUC v4 - Plataforma Educativa Matemática',
   description: 'La plataforma educativa más avanzada para el aprendizaje de matemáticas en tiempo real. Diseñada para la excelencia académica UC.',
   keywords: ['matemáticas', 'educación', 'universidad', 'LaTeX', 'UC', 'Chile'],
@@ -26,7 +28,6 @@ export const metadata: Metadata = {
     shortcut: '/favicon-16x16.png',
     apple: '/apple-touch-icon.png',
   },
-  manifest: '/manifest.json',
   openGraph: {
     title: 'MATUC v4 - Matemáticas del Futuro',
     description: 'Plataforma educativa avanzada para matemáticas universitarias con LaTeX en tiempo real',
@@ -74,6 +75,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <html
       lang="es-CL"
       className={`${inter.variable} scroll-smooth`}
+      data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
       <head>
@@ -109,10 +111,13 @@ export default function RootLayout({ children }: RootLayoutProps) {
           Saltar al contenido principal
         </a>
 
-        {/* Main content */}
-        <main id="main-content" className="min-h-screen">
-          {children}
-        </main>
+        {/* Providers que envuelven toda la aplicación */}
+        <AppProviders>
+          {/* Main content */}
+          <main id="main-content" className="min-h-screen">
+            {children}
+          </main>
+        </AppProviders>
 
         {/* Performance monitoring script placeholder */}
         {process.env.NODE_ENV === 'production' && (
