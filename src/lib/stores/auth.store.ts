@@ -1,305 +1,465 @@
-// src/lib/stores/ui.store.ts - Store Zustand para Estado de UI
+// src/lib/stores/auth.store.ts - Store de autenticación con Zustand + Next.js 15 (SIN IMMER)
 'use client'
 
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
 
-// Tipos
-export type Theme = 'light' | 'dark' | 'system'
-export type SidebarState = 'open' | 'closed' | 'collapsed'
-
-export interface ToastMessage {
-    id: string
-    title: string
-    description?: string
-    variant: 'default' | 'success' | 'error' | 'warning' | 'info' | 'uc'
-    duration?: number
+// Tipos principales para autenticación
+export interface User {
+    uid: string
+    nombre: string
+    apellido: string
+    email: string
+    admin: boolean
+    role: 'estudiante' | 'ayudante' | 'profesor' | 'profesor_editor' | 'administrador'
+    ultimaConexion?: Date
+    conectado: boolean
+    avatar?: string
 }
 
-export interface UIState {
-    // Tema
-    theme: Theme
-    isDarkMode: boolean
+// Interface del store de autenticación
+interface AuthStore {
+    // Estado
+    user: User | null
+    isAuthenticated: boolean
+    isLoading: boolean
+    error: string | null
 
-    // Layout
-    sidebarState: SidebarState
-    isMobile: boolean
+    // Acciones principales
+    login: (email: string, password: string) => Promise<boolean>
+    loginGoogle: (token: string) => Promise<boolean>
+    loginOutlook: (token: string) => Promise<boolean>
+    logout: () => Promise<void>
+    checkAuth: () => Promise<void>
 
-    // Modals
-    modals: Record<string, boolean>
+    // Acciones de estado
+    setUser: (user: User | null) => void
+    setLoading: (loading: boolean) => void
+    setError: (error: string | null) => void
+    clearError: () => void
 
-    // Loading states
-    loadingStates: Record<string, boolean>
-
-    // Toasts (respaldo si no usas ToastProvider)
-    toasts: ToastMessage[]
-
-    // Acciones de tema
-    setTheme: (theme: Theme) => void
-    toggleTheme: () => void
-
-    // Acciones de layout  
-    setSidebarState: (state: SidebarState) => void
-    toggleSidebar: () => void
-    setMobile: (isMobile: boolean) => void
-
-    // Acciones de modals
-    openModal: (modalId: string) => void
-    closeModal: (modalId: string) => void
-    toggleModal: (modalId: string) => void
-    isModalOpen: (modalId: string) => boolean
-
-    // Acciones de loading
-    setLoading: (key: string, isLoading: boolean) => void
-    isLoading: (key: string) => boolean
-
-    // Acciones de toasts
-    addToast: (toast: Omit<ToastMessage, 'id'>) => void
-    removeToast: (id: string) => void
-    clearToasts: () => void
+    // Utilidades
+    hasPermission: (permission: string) => boolean
+    isRole: (role: string) => boolean
+    getDisplayName: () => string
 }
 
-// Store principal de UI
-export const useUIStore = create<UIState>()(
+// Store principal usando Zustand SIN immer
+export const useAuthStore = create<AuthStore>()(
     devtools(
         persist(
             (set, get) => ({
                 // Estado inicial
-                theme: 'system',
-                isDarkMode: false,
-                sidebarState: 'open',
-                isMobile: false,
-                modals: {},
-                loadingStates: {},
-                toasts: [],
+                user: null,
+                isAuthenticated: false,
+                isLoading: false,
+                error: null,
 
-                // Acciones de tema
-                setTheme: (theme) => {
-                    set({ theme }, false, 'setTheme')
+                // Acción: Login tradicional email/password
+                login: async (email: string, password: string) => {
+                    set({ isLoading: true, error: null })
 
-                    // Actualizar isDarkMode basado en el tema
-                    if (theme === 'dark') {
-                        set({ isDarkMode: true }, false, 'setDarkMode')
-                        document.documentElement.classList.add('dark')
-                        document.documentElement.classList.remove('light')
-                    } else if (theme === 'light') {
-                        set({ isDarkMode: false }, false, 'setLightMode')
-                        document.documentElement.classList.add('light')
-                        document.documentElement.classList.remove('dark')
-                    } else {
-                        // System theme
-                        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-                        set({ isDarkMode: systemDark }, false, 'setSystemMode')
-                        document.documentElement.classList.toggle('dark', systemDark)
-                        document.documentElement.classList.toggle('light', !systemDark)
+                    try {
+                        // TODO: Conectar con tu backend existente
+                        const response = await fetch('/api/auth/login', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email, password }),
+                        })
+
+                        const data = await response.json()
+
+                        if (response.ok && data.ok) {
+                            const user: User = {
+                                uid: data.usuario.uid,
+                                nombre: data.usuario.nombre,
+                                apellido: data.usuario.apellido,
+                                email: data.usuario.email,
+                                admin: data.usuario.admin,
+                                role: data.usuario.admin ? 'administrador' : 'estudiante',
+                                conectado: true,
+                                ultimaConexion: new Date()
+                            }
+
+                            set({
+                                user,
+                                isAuthenticated: true,
+                                isLoading: false,
+                                error: null
+                            })
+
+                            // Guardar token
+                            if (data.token) {
+                                localStorage.setItem('matuc_token', data.token)
+                            }
+
+                            return true
+                        } else {
+                            set({
+                                error: data.message || 'Credenciales incorrectas',
+                                isLoading: false
+                            })
+                            return false
+                        }
+                    } catch {
+                        set({
+                            error: 'Error de conexión',
+                            isLoading: false
+                        })
+                        return false
                     }
                 },
 
-                toggleTheme: () => {
-                    const { theme } = get()
-                    const newTheme = theme === 'dark' ? 'light' : 'dark'
-                    get().setTheme(newTheme)
-                },
+                // Acción: Login con Google OAuth
+                loginGoogle: async (credential: string) => {
+                    set({ isLoading: true, error: null })
 
-                // Acciones de layout
-                setSidebarState: (sidebarState) =>
-                    set({ sidebarState }, false, 'setSidebarState'),
+                    try {
+                        const response = await fetch('/api/auth/google', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ credential }),
+                        })
 
-                toggleSidebar: () => {
-                    const { sidebarState } = get()
-                    const newState = sidebarState === 'open' ? 'collapsed' : 'open'
-                    set({ sidebarState: newState }, false, 'toggleSidebar')
-                },
+                        const data = await response.json()
 
-                setMobile: (isMobile) =>
-                    set({ isMobile }, false, 'setMobile'),
+                        if (response.ok && data.ok) {
+                            const user: User = {
+                                uid: data.usuario.uid,
+                                nombre: data.usuario.nombre,
+                                apellido: data.usuario.apellido,
+                                email: data.usuario.email,
+                                admin: data.usuario.admin,
+                                role: data.usuario.admin ? 'administrador' : 'estudiante',
+                                conectado: true,
+                                ultimaConexion: new Date()
+                            }
 
-                // Acciones de modals
-                openModal: (modalId) =>
-                    set(
-                        (state) => ({
-                            modals: { ...state.modals, [modalId]: true }
-                        }),
-                        false,
-                        'openModal'
-                    ),
+                            set({
+                                user,
+                                isAuthenticated: true,
+                                isLoading: false,
+                                error: null
+                            })
 
-                closeModal: (modalId) =>
-                    set(
-                        (state) => ({
-                            modals: { ...state.modals, [modalId]: false }
-                        }),
-                        false,
-                        'closeModal'
-                    ),
+                            if (data.token) {
+                                localStorage.setItem('matuc_token', data.token)
+                            }
 
-                toggleModal: (modalId) => {
-                    const { modals } = get()
-                    const isOpen = modals[modalId] || false
-                    if (isOpen) {
-                        get().closeModal(modalId)
-                    } else {
-                        get().openModal(modalId)
+                            return true
+                        } else {
+                            set({
+                                error: data.message || 'Error con Google',
+                                isLoading: false
+                            })
+                            return false
+                        }
+                    } catch {
+                        set({
+                            error: 'Error de conexión con Google',
+                            isLoading: false
+                        })
+                        return false
                     }
                 },
 
-                isModalOpen: (modalId) => {
-                    const { modals } = get()
-                    return modals[modalId] || false
-                },
+                // Acción: Login con Outlook/Microsoft
+                loginOutlook: async (credential: string) => {
+                    set({ isLoading: true, error: null })
 
-                // Acciones de loading
-                setLoading: (key, isLoading) =>
-                    set(
-                        (state) => ({
-                            loadingStates: { ...state.loadingStates, [key]: isLoading }
-                        }),
-                        false,
-                        'setLoading'
-                    ),
+                    try {
+                        // Usar el endpoint que ya tienes en tu backend
+                        const response = await fetch('/api/auth/outlook', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ credential }),
+                        })
 
-                isLoading: (key) => {
-                    const { loadingStates } = get()
-                    return loadingStates[key] || false
-                },
+                        const data = await response.json()
 
-                // Acciones de toasts
-                addToast: (toast) => {
-                    const id = Math.random().toString(36).substr(2, 9)
-                    const newToast = { ...toast, id }
+                        if (response.ok && data.ok) {
+                            const user: User = {
+                                uid: data.usuario.uid,
+                                nombre: data.usuario.nombre,
+                                apellido: data.usuario.apellido,
+                                email: data.usuario.email,
+                                admin: data.usuario.admin,
+                                role: data.usuario.admin ? 'administrador' : 'estudiante',
+                                conectado: true,
+                                ultimaConexion: new Date()
+                            }
 
-                    set(
-                        (state) => ({
-                            toasts: [...state.toasts, newToast]
-                        }),
-                        false,
-                        'addToast'
-                    )
+                            set({
+                                user,
+                                isAuthenticated: true,
+                                isLoading: false,
+                                error: null
+                            })
 
-                    // Auto remove after duration
-                    if (toast.duration !== 0) {
-                        setTimeout(() => {
-                            get().removeToast(id)
-                        }, toast.duration || 5000)
+                            if (data.token) {
+                                localStorage.setItem('matuc_token', data.token)
+                            }
+
+                            return true
+                        } else {
+                            set({
+                                error: data.message || 'Error con Outlook',
+                                isLoading: false
+                            })
+                            return false
+                        }
+                    } catch {
+                        set({
+                            error: 'Error de conexión con Outlook',
+                            isLoading: false
+                        })
+                        return false
                     }
                 },
 
-                removeToast: (id) =>
-                    set(
-                        (state) => ({
-                            toasts: state.toasts.filter(toast => toast.id !== id)
-                        }),
-                        false,
-                        'removeToast'
-                    ),
+                // Acción: Cerrar sesión
+                logout: async () => {
+                    set({ isLoading: true })
 
-                clearToasts: () =>
-                    set({ toasts: [] }, false, 'clearToasts')
+                    try {
+                        const token = localStorage.getItem('matuc_token')
+
+                        if (token) {
+                            // Notificar al backend
+                            await fetch('/api/auth/logout', {
+                                method: 'POST',
+                                headers: { 'Authorization': `Bearer ${token}` },
+                            })
+                        }
+
+                        // Limpiar estado local
+                        localStorage.removeItem('matuc_token')
+
+                        set({
+                            user: null,
+                            isAuthenticated: false,
+                            isLoading: false,
+                            error: null
+                        })
+
+                    } catch (error) {
+                        console.error('Error en logout:', error)
+
+                        // Limpiar estado local aunque falle
+                        localStorage.removeItem('matuc_token')
+
+                        set({
+                            user: null,
+                            isAuthenticated: false,
+                            isLoading: false,
+                            error: null
+                        })
+                    }
+                },
+
+                // Acción: Verificar autenticación existente
+                checkAuth: async () => {
+                    const token = localStorage.getItem('matuc_token')
+
+                    if (!token) {
+                        set({
+                            isLoading: false,
+                            isAuthenticated: false,
+                            user: null
+                        })
+                        return
+                    }
+
+                    set({ isLoading: true })
+
+                    try {
+                        // Usar tu endpoint de verificación existente
+                        const response = await fetch('/api/auth/me', {
+                            headers: { 'Authorization': `Bearer ${token}` },
+                        })
+
+                        const data = await response.json()
+
+                        if (response.ok && data.ok) {
+                            const user: User = {
+                                uid: data.usuario.uid,
+                                nombre: data.usuario.nombre,
+                                apellido: data.usuario.apellido,
+                                email: data.usuario.email,
+                                admin: data.usuario.admin,
+                                role: data.usuario.admin ? 'administrador' : 'estudiante',
+                                conectado: true,
+                                ultimaConexion: new Date()
+                            }
+
+                            set({
+                                user,
+                                isAuthenticated: true,
+                                isLoading: false,
+                                error: null
+                            })
+                        } else {
+                            // Token inválido
+                            localStorage.removeItem('matuc_token')
+
+                            set({
+                                user: null,
+                                isAuthenticated: false,
+                                isLoading: false,
+                                error: null
+                            })
+                        }
+                    } catch (error) {
+                        console.error('Error verificando auth:', error)
+
+                        set({
+                            isLoading: false,
+                            error: 'Error de verificación'
+                        })
+                    }
+                },
+
+                // Acciones de estado directo
+                setUser: (user: User | null) => {
+                    set({
+                        user,
+                        isAuthenticated: !!user
+                    })
+                },
+
+                setLoading: (loading: boolean) => {
+                    set({ isLoading: loading })
+                },
+
+                setError: (error: string | null) => {
+                    set({ error })
+                },
+
+                clearError: () => {
+                    set({ error: null })
+                },
+
+                // Utilidad: Verificar permisos por rol
+                hasPermission: (permission: string) => {
+                    const { user } = get()
+                    if (!user) return false
+
+                    // Admin tiene todos los permisos
+                    if (user.admin || user.role === 'administrador') return true
+
+                    // Mapa de permisos por rol
+                    const rolePermissions = {
+                        estudiante: [
+                            'read_content',
+                            'submit_exercises',
+                            'view_progress'
+                        ],
+                        ayudante: [
+                            'read_content',
+                            'submit_exercises',
+                            'moderate_chat',
+                            'help_students'
+                        ],
+                        profesor: [
+                            'read_content',
+                            'create_content',
+                            'manage_students',
+                            'view_analytics',
+                            'create_exercises'
+                        ],
+                        profesor_editor: [
+                            'read_content',
+                            'create_content',
+                            'edit_content',
+                            'manage_students',
+                            'view_analytics',
+                            'create_exercises',
+                            'edit_any_content'
+                        ],
+                        administrador: ['*'] // Todos los permisos
+                    }
+
+                    const userPermissions = rolePermissions[user.role] || []
+                    return userPermissions.includes(permission) || userPermissions.includes('*')
+                },
+
+                // Utilidad: Verificar rol específico
+                isRole: (role: string) => {
+                    const { user } = get()
+                    return user?.role === role
+                },
+
+                // Utilidad: Nombre completo para display
+                getDisplayName: () => {
+                    const { user } = get()
+                    if (!user) return 'Usuario'
+                    return `${user.nombre} ${user.apellido}`.trim()
+                },
+
             }),
             {
-                name: 'ui-store',
+                name: 'matuc-auth-store',
+                // Solo persistir datos esenciales
                 partialize: (state) => ({
-                    theme: state.theme,
-                    sidebarState: state.sidebarState
-                })
+                    user: state.user,
+                    isAuthenticated: state.isAuthenticated,
+                }),
             }
         ),
         {
-            name: 'ui-store',
+            name: 'matuc-auth-store',
             enabled: process.env.NODE_ENV === 'development'
         }
     )
 )
 
-// Selectores optimizados
-export const useTheme = () => useUIStore(state => state.theme)
-export const useIsDarkMode = () => useUIStore(state => state.isDarkMode)
-export const useSidebarState = () => useUIStore(state => state.sidebarState)
-export const useIsMobile = () => useUIStore(state => state.isMobile)
-
-// Hook para manejo de modals
-export const useModal = (modalId: string) => {
-    const isOpen = useUIStore(state => state.isModalOpen(modalId))
-    const openModal = useUIStore(state => state.openModal)
-    const closeModal = useUIStore(state => state.closeModal)
-    const toggleModal = useUIStore(state => state.toggleModal)
-
+// Hooks de conveniencia para usar en componentes
+export const useAuth = () => {
+    const store = useAuthStore()
     return {
-        isOpen,
-        open: () => openModal(modalId),
-        close: () => closeModal(modalId),
-        toggle: () => toggleModal(modalId)
-    }
-}
-
-// Hook para manejo de loading states
-export const useLoading = (key: string) => {
-    const isLoading = useUIStore(state => state.isLoading(key))
-    const setLoading = useUIStore(state => state.setLoading)
-
-    return {
-        isLoading,
-        setLoading: (loading: boolean) => setLoading(key, loading)
-    }
-}
-
-// Hook para toasts (respaldo del ToastProvider)
-export const useUIToasts = () => {
-    const toasts = useUIStore(state => state.toasts)
-    const addToast = useUIStore(state => state.addToast)
-    const removeToast = useUIStore(state => state.removeToast)
-    const clearToasts = useUIStore(state => state.clearToasts)
-
-    return {
-        toasts,
-        addToast,
-        removeToast,
-        clearToasts,
-        // Helper methods
-        success: (title: string, description?: string) =>
-            addToast({ title, description, variant: 'success' }),
-        error: (title: string, description?: string) =>
-            addToast({ title, description, variant: 'error' }),
-        warning: (title: string, description?: string) =>
-            addToast({ title, description, variant: 'warning' }),
-        info: (title: string, description?: string) =>
-            addToast({ title, description, variant: 'info' }),
-        uc: (title: string, description?: string) =>
-            addToast({ title, description, variant: 'uc' })
-    }
-}
-
-// Hook completo de UI
-export const useUI = () => {
-    const store = useUIStore()
-
-    return {
-        // Tema
-        theme: store.theme,
-        isDarkMode: store.isDarkMode,
-        setTheme: store.setTheme,
-        toggleTheme: store.toggleTheme,
-
-        // Layout
-        sidebarState: store.sidebarState,
-        isMobile: store.isMobile,
-        setSidebarState: store.setSidebarState,
-        toggleSidebar: store.toggleSidebar,
-        setMobile: store.setMobile,
-
-        // Modals
-        openModal: store.openModal,
-        closeModal: store.closeModal,
-        toggleModal: store.toggleModal,
-        isModalOpen: store.isModalOpen,
-
-        // Loading
-        setLoading: store.setLoading,
+        // Estado
+        user: store.user,
+        isAuthenticated: store.isAuthenticated,
         isLoading: store.isLoading,
+        error: store.error,
 
-        // Toasts
-        addToast: store.addToast,
-        removeToast: store.removeToast,
-        clearToasts: store.clearToasts
+        // Acciones principales
+        login: store.login,
+        loginGoogle: store.loginGoogle,
+        loginOutlook: store.loginOutlook,
+        logout: store.logout,
+
+        // Utilidades
+        hasPermission: store.hasPermission,
+        isRole: store.isRole,
+        displayName: store.getDisplayName(),
+
+        // Acciones de estado
+        clearError: store.clearError,
     }
+}
+
+// Hook específico para datos del usuario (optimizado)
+export const useUser = () => {
+    return useAuthStore((state) => state.user)
+}
+
+// Hook para loading state (optimizado)
+export const useAuthLoading = () => {
+    return useAuthStore((state) => state.isLoading)
+}
+
+// Hook para errores (optimizado)
+export const useAuthError = () => {
+    return useAuthStore((state) => state.error)
+}
+
+// Hook para verificar permisos específicos
+export const usePermission = (permission: string) => {
+    return useAuthStore((state) => state.hasPermission(permission))
+}
+
+// Hook para verificar rol específico
+export const useRole = (role: string) => {
+    return useAuthStore((state) => state.isRole(role))
 }
