@@ -1,18 +1,23 @@
-import { clsx, type ClassValue } from 'clsx'
-import { twMerge } from 'tailwind-merge'
+// src/lib/utils/cn.ts - Utilidad para combinar clases CSS
+import { type ClassValue, clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
 
 /**
- * Utility function para combinar class names de Tailwind CSS
- * Combina clsx con twMerge para mejor handling de clases conflictivas
+ * Combina clases CSS de forma inteligente
+ * - Utiliza clsx para conditional classes
+ * - Utiliza tailwind-merge para resolver conflictos de Tailwind
+ * - Optimiza el resultado final eliminando duplicados
  * 
- * @param inputs - Class names a combinar
- * @returns String con las clases finales
+ * @param inputs - Array de clases CSS, objetos condicionales o strings
+ * @returns String con clases CSS optimizadas
  * 
  * @example
- * ```tsx
- * cn('px-2 py-1', 'px-4', { 'bg-red-500': isError }) 
- * // Result: "py-1 px-4 bg-red-500" (px-2 es reemplazado por px-4)
- * ```
+ * cn('px-2 py-1', 'bg-red-500', { 'text-white': true })
+ * // Result: "px-2 py-1 bg-red-500 text-white"
+ * 
+ * @example
+ * cn('px-2 py-1 px-4') // Conflicto resuelto
+ * // Result: "py-1 px-4"
  */
 export function cn(...inputs: ClassValue[]): string {
     return twMerge(clsx(inputs))
