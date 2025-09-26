@@ -3,7 +3,8 @@
 
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useAuth, User } from '@/lib/stores/auth.store'
+import { useAuth } from '@/lib/stores/auth.store'
+
 import {
     Home,
     BookOpen,
@@ -22,6 +23,7 @@ import {
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import type { Route } from 'next'
+import { User } from '@/types/user.types'
 
 interface DashboardLayoutProps {
     children: React.ReactNode
@@ -40,23 +42,23 @@ const getNavigationItems = (role: string): NavigationItem[] => {
     ]
 
     const studentItems: NavigationItem[] = [
-        { icon: BookOpen, label: 'Mis Cursos', href: '/dashboard' as Route },
-        { icon: Calculator, label: 'Ejercicios', href: '/dashboard' as Route },
-        { icon: BarChart3, label: 'Mi Progreso', href: '/dashboard' as Route },
+        { icon: BookOpen, label: 'Mis Cursos', href: '/dashboard/courses' as Route },
+        { icon: Calculator, label: 'Ejercicios', href: '/dashboard/exercises' as Route },
+        { icon: BarChart3, label: 'Mi Progreso', href: '/dashboard/progress' as Route },
     ]
 
     const teacherItems: NavigationItem[] = [
-        { icon: BookOpen, label: 'Cursos', href: '/dashboard' as Route },
-        { icon: Calculator, label: 'Ejercicios', href: '/dashboard' as Route },
-        { icon: Users, label: 'Estudiantes', href: '/dashboard' as Route },
-        { icon: BarChart3, label: 'Analytics', href: '/dashboard' as Route },
+        { icon: BookOpen, label: 'Cursos', href: '/dashboard/courses' as Route },
+        { icon: Calculator, label: 'Ejercicios', href: '/dashboard/exercises' as Route },
+        { icon: Users, label: 'Estudiantes', href: '/dashboard/students' as Route },
+        { icon: BarChart3, label: 'Analytics', href: '/dashboard/analytics' as Route },
     ]
 
     const adminItems: NavigationItem[] = [
-        { icon: BookOpen, label: 'Cursos', href: '/dashboard' as Route },
-        { icon: Users, label: 'Usuarios', href: '/dashboard' as Route },
-        { icon: BarChart3, label: 'Analytics', href: '/dashboard' as Route },
-        { icon: Settings, label: 'Sistema', href: '/dashboard' as Route },
+        { icon: BookOpen, label: 'Cursos', href: '/dashboard/courses' as Route },
+        { icon: Users, label: 'Usuarios', href: '/dashboard/users' as Route },
+        { icon: BarChart3, label: 'Analytics', href: '/dashboard/analytics' as Route },
+        { icon: Settings, label: 'Sistema', href: '/dashboard/settings' as Route },
     ]
 
     switch (role) {
@@ -268,12 +270,12 @@ function SidebarContent({
 
             {/* Navigation */}
             <nav className="flex-1 px-4 py-6 space-y-2">
-                {navigationItems.map((item) => {
+                {navigationItems.map((item, index) => {
                     const isActive = pathname === item.href
                     const Icon = item.icon
 
                     return (
-                        <Link key={item.href} href={item.href as Route} onClick={onClose}>
+                        <Link key={index} href={item.href as Route} onClick={onClose}>
                             <motion.div
                                 whileHover={{ x: 4 }}
                                 className={`group flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${isActive
