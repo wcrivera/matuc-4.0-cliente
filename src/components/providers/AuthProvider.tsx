@@ -1,4 +1,4 @@
-// src/components/providers/AuthProvider.tsx - AuthProvider sin errores ESLint
+// src/components/providers/AuthProvider.tsx - Con manejo de logout automático
 'use client'
 
 import React, { useEffect, useState, useCallback } from 'react'
@@ -24,6 +24,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return authRoutes.some(route => path.startsWith(route))
   }, [])
 
+  // Verificar si la ruta actual es pública (no requiere autenticación)
+  const isPublicRoute = useCallback((path: string): boolean => {
+    const publicRoutes = ['/', '/about', '/contact']
+    return publicRoutes.includes(path)
+  }, [])
+
   // Determinar destino según el rol del usuario usando utilidades centralizadas
   const determineUserDestination = useCallback((user: User): string => {
     return getUserDefaultRoute(user.role)
@@ -31,31 +37,39 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Manejar cambios de estado de autenticación
   const handleAuthStateChange = useCallback(() => {
-    // Solo manejar redirecciones automáticas desde páginas de auth
+    // CASO 1: Usuario autenticado en página de auth -> redirigir a dashboard
     if (isAuthenticated && user && isAuthRoute(pathname)) {
       const destination = determineUserDestination(user)
-      console.log('Redirigiendo usuario autenticado:', user.email, 'a:', destination)
-
-      // Usar replace para no agregar a historial
+      console.log('Usuario autenticado en página de auth, redirigiendo a:', destination)
       router.replace(destination as `/admin` | `/courses` | `/classroom` | `/dashboard`)
     }
-  }, [isAuthenticated, user, pathname, router, isAuthRoute, determineUserDestination])
+
+    // CASO 2: Usuario NO autenticado en ruta protegida -> redirigir a login
+    else if (!isAuthenticated && !isAuthRoute(pathname) && !isPublicRoute(pathname)) {
+      console.log('Usuario no autenticado en ruta protegida, redirigiendo a login')
+      router.replace('/login')
+    }
+
+    // CASO 3: Logout detectado -> redirigir a home
+    else if (!isAuthenticated && !user && !isAuthRoute(pathname) && !isPublicRoute(pathname)) {
+      console.log('Logout detectado, redirigiendo a home')
+      router.replace('/')
+    }
+  }, [isAuthenticated, user, pathname, router, isAuthRoute, isPublicRoute, determineUserDestination])
 
   // Inicializar MSAL y verificar autenticación
   useEffect(() => {
     const initializeAuth = async (): Promise<void> => {
       try {
-        // 1. Inicializar MSAL
         await initializeMsal()
         console.log('MSAL inicializado')
         setMsalInitialized(true)
 
-        // 2. Verificar sesión existente
         await checkAuth()
         console.log('Verificación de auth completada')
       } catch (error) {
         console.error('Error inicializando auth:', error)
-        setMsalInitialized(true) // Continuar aunque MSAL falle
+        setMsalInitialized(true)
       }
     }
 
@@ -74,7 +88,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return <AuthLoadingScreen />
   }
 
-  // Envolver con MsalProvider una vez inicializado
   return (
     <MsalProvider instance={msalInstance}>
       {children}
@@ -82,7 +95,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   )
 }
 
-// Componente de loading mejorado con tipos explícitos
+// Componente de loading
 function AuthLoadingScreen(): React.ReactElement {
   const [loadingText, setLoadingText] = useState<string>('Inicializando autenticación...')
 
@@ -106,7 +119,6 @@ function AuthLoadingScreen(): React.ReactElement {
   return (
     <div className="min-h-screen bg-gradient-to-br from-uc-azul via-uc-azul/90 to-uc-celeste flex items-center justify-center">
       <div className="text-center max-w-md mx-auto px-6">
-        {/* Logo animado */}
         <div className="mb-8">
           <div className="bg-white/20 backdrop-blur-sm rounded-xl p-6 inline-block animate-pulse">
             <svg
@@ -119,12 +131,10 @@ function AuthLoadingScreen(): React.ReactElement {
           </div>
         </div>
 
-        {/* Título */}
         <h2 className="text-2xl font-semibold text-white mb-4">
           MATUC v4.0
         </h2>
 
-        {/* Spinner personalizado */}
         <div className="flex justify-center mb-6">
           <div className="relative">
             <div className="animate-spin rounded-full h-12 w-12 border-4 border-uc-amarillo/30"></div>
@@ -132,12 +142,10 @@ function AuthLoadingScreen(): React.ReactElement {
           </div>
         </div>
 
-        {/* Mensaje dinámico */}
         <p className="text-white/70 text-sm leading-relaxed">
           {loadingText}
         </p>
 
-        {/* Indicadores de seguridad */}
         <div className="mt-8 flex items-center justify-center space-x-6 text-white/40 text-xs">
           <span className="flex items-center space-x-1">
             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
