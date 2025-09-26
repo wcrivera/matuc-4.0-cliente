@@ -1,30 +1,21 @@
-// src/lib/stores/auth.store.ts - Store de autenticación con Zustand + Next.js 15 (SIN IMMER)
+// src/lib/stores/auth.store.ts - Store actualizado con tipos centralizados
 'use client'
 
 import { create } from 'zustand'
-import { devtools, persist } from 'zustand/middleware'
-
-// Tipos principales para autenticación
-export interface User {
-    uid: string
-    nombre: string
-    apellido: string
-    email: string
-    admin: boolean
-    role: 'estudiante' | 'ayudante' | 'profesor' | 'profesor_editor' | 'administrador'
-    ultimaConexion?: Date
-    conectado: boolean
-    avatar?: string
-}
+import { devtools } from 'zustand/middleware'
+import {
+    type User,
+    type AuthState,
+    type AuthResponse,
+    // type BackendUser,
+    mapBackendUserToUser,
+    getUserDisplayName,
+    hasPermission,
+    canUserAccessRoute
+} from '@/types/user.types'
 
 // Interface del store de autenticación
-interface AuthStore {
-    // Estado
-    user: User | null
-    isAuthenticated: boolean
-    isLoading: boolean
-    error: string | null
-
+interface AuthStore extends AuthState {
     // Acciones principales
     login: (email: string, password: string) => Promise<boolean>
     loginGoogle: (token: string) => Promise<boolean>
@@ -38,259 +29,246 @@ interface AuthStore {
     setError: (error: string | null) => void
     clearError: () => void
 
-    // Utilidades
+    // Utilidades con tipos centralizados
     hasPermission: (permission: string) => boolean
-    isRole: (role: string) => boolean
+    canAccessRoute: (route: string) => boolean
     getDisplayName: () => string
 }
 
-// Store principal usando Zustand SIN immer
+// Función auxiliar para manejar cookies
+const cookieUtils = {
+    set: (name: string, value: string, days = 7) => {
+        if (typeof document !== 'undefined') {
+            const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString()
+            document.cookie = `${name}=${value}; expires=${expires}; path=/; samesite=strict`
+        }
+    },
+    get: (name: string): string | null => {
+        if (typeof document === 'undefined') return null
+        const cookies = document.cookie.split(';').reduce((acc, cookie) => {
+            const [key, value] = cookie.trim().split('=')
+            acc[key] = value
+            return acc
+        }, {} as Record<string, string>)
+        return cookies[name] || null
+    },
+    remove: (name: string) => {
+        if (typeof document !== 'undefined') {
+            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/`
+        }
+    }
+}
+
+// Store principal usando Zustand
 export const useAuthStore = create<AuthStore>()(
     devtools(
-        persist(
-            (set, get) => ({
-                // Estado inicial
-                user: null,
-                isAuthenticated: false,
-                isLoading: false,
-                error: null,
+        (set, get) => ({
+            // Estado inicial
+            user: null,
+            isAuthenticated: false,
+            isLoading: false,
+            error: null,
 
-                // Acción: Login tradicional email/password
-                login: async (email: string, password: string) => {
-                    set({ isLoading: true, error: null })
+            // Acción: Login tradicional email/password
+            login: async (email: string, password: string) => {
+                set({ isLoading: true, error: null })
 
-                    try {
-                        // TODO: Conectar con tu backend existente
-                        const response = await fetch('/api/auth/login', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ email, password }),
-                        })
+                try {
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password }),
+                    })
 
-                        const data = await response.json()
+                    const data: AuthResponse = await response.json()
 
-                        if (response.ok && data.ok) {
-                            const user: User = {
-                                uid: data.usuario.uid,
-                                nombre: data.usuario.nombre,
-                                apellido: data.usuario.apellido,
-                                email: data.usuario.email,
-                                admin: data.usuario.admin,
-                                role: data.usuario.admin ? 'administrador' : 'estudiante',
-                                conectado: true,
-                                ultimaConexion: new Date()
-                            }
-
-                            set({
-                                user,
-                                isAuthenticated: true,
-                                isLoading: false,
-                                error: null
-                            })
-
-                            // Guardar token
-                            if (data.token) {
-                                localStorage.setItem('matuc_token', data.token)
-                            }
-
-                            return true
-                        } else {
-                            set({
-                                error: data.message || 'Credenciales incorrectas',
-                                isLoading: false
-                            })
-                            return false
-                        }
-                    } catch {
-                        set({
-                            error: 'Error de conexión',
-                            isLoading: false
-                        })
-                        return false
-                    }
-                },
-
-                // Acción: Login con Google OAuth
-                loginGoogle: async (credential: string) => {
-                    set({ isLoading: true, error: null })
-
-                    try {
-                        const response = await fetch('/api/auth/google', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ credential }),
-                        })
-
-                        const data = await response.json()
-
-                        if (response.ok && data.ok) {
-                            const user: User = {
-                                uid: data.usuario.uid,
-                                nombre: data.usuario.nombre,
-                                apellido: data.usuario.apellido,
-                                email: data.usuario.email,
-                                admin: data.usuario.admin,
-                                role: data.usuario.admin ? 'administrador' : 'estudiante',
-                                conectado: true,
-                                ultimaConexion: new Date()
-                            }
-
-                            set({
-                                user,
-                                isAuthenticated: true,
-                                isLoading: false,
-                                error: null
-                            })
-
-                            if (data.token) {
-                                localStorage.setItem('matuc_token', data.token)
-                            }
-
-                            return true
-                        } else {
-                            set({
-                                error: data.message || 'Error con Google',
-                                isLoading: false
-                            })
-                            return false
-                        }
-                    } catch {
-                        set({
-                            error: 'Error de conexión con Google',
-                            isLoading: false
-                        })
-                        return false
-                    }
-                },
-
-                // Acción: Login con Outlook/Microsoft
-                loginOutlook: async (credential: string) => {
-                    set({ isLoading: true, error: null })
-
-                    try {
-                        // Usar el endpoint que ya tienes en tu backend
-                        const response = await fetch('/api/auth/outlook', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ credential }),
-                        })
-
-                        const data = await response.json()
-
-                        if (response.ok && data.ok) {
-                            const user: User = {
-                                uid: data.usuario.uid,
-                                nombre: data.usuario.nombre,
-                                apellido: data.usuario.apellido,
-                                email: data.usuario.email,
-                                admin: data.usuario.admin,
-                                role: data.usuario.admin ? 'administrador' : 'estudiante',
-                                conectado: true,
-                                ultimaConexion: new Date()
-                            }
-
-                            set({
-                                user,
-                                isAuthenticated: true,
-                                isLoading: false,
-                                error: null
-                            })
-
-                            if (data.token) {
-                                localStorage.setItem('matuc_token', data.token)
-                            }
-
-                            return true
-                        } else {
-                            set({
-                                error: data.message || 'Error con Outlook',
-                                isLoading: false
-                            })
-                            return false
-                        }
-                    } catch {
-                        set({
-                            error: 'Error de conexión con Outlook',
-                            isLoading: false
-                        })
-                        return false
-                    }
-                },
-
-                // Acción: Cerrar sesión
-                logout: async () => {
-                    set({ isLoading: true })
-
-                    try {
-                        const token = localStorage.getItem('matuc_token')
-
-                        if (token) {
-                            // Notificar al backend
-                            await fetch('/api/auth/logout', {
-                                method: 'POST',
-                                headers: { 'Authorization': `Bearer ${token}` },
-                            })
-                        }
-
-                        // Limpiar estado local
-                        localStorage.removeItem('matuc_token')
+                    if (response.ok && data.ok && data.usuario) {
+                        const user = mapBackendUserToUser(data.usuario)
 
                         set({
-                            user: null,
-                            isAuthenticated: false,
+                            user,
+                            isAuthenticated: true,
                             isLoading: false,
                             error: null
                         })
 
-                    } catch (error) {
-                        console.error('Error en logout:', error)
+                        // Guardar en cookies
+                        if (data.token) {
+                            cookieUtils.set('matuc_token', data.token)
+                            cookieUtils.set('matuc_role', user.role)
+                            cookieUtils.set('matuc_user', JSON.stringify({
+                                uid: user.uid,
+                                nombre: user.nombre,
+                                email: user.email
+                            }))
+                        }
 
-                        // Limpiar estado local aunque falle
-                        localStorage.removeItem('matuc_token')
+                        return true
+                    } else {
+                        set({
+                            error: data.message || 'Error de autenticación',
+                            isLoading: false
+                        })
+                        return false
+                    }
+                } catch {
+                    set({
+                        error: 'Error de conexión',
+                        isLoading: false
+                    })
+                    return false
+                }
+            },
+
+            // Acción: Login con Google
+            loginGoogle: async (token: string) => {
+                set({ isLoading: true, error: null })
+
+                try {
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ token }),
+                    })
+
+                    const data: AuthResponse = await response.json()
+
+                    if (response.ok && data.ok && data.usuario) {
+                        const user = mapBackendUserToUser(data.usuario)
 
                         set({
-                            user: null,
-                            isAuthenticated: false,
+                            user,
+                            isAuthenticated: true,
                             isLoading: false,
                             error: null
                         })
-                    }
-                },
 
-                // Acción: Verificar autenticación existente
-                checkAuth: async () => {
-                    const token = localStorage.getItem('matuc_token')
+                        if (data.token) {
+                            cookieUtils.set('matuc_token', data.token)
+                            cookieUtils.set('matuc_role', user.role)
+                        }
+
+                        return true
+                    } else {
+                        set({
+                            error: data.message || 'Error con Google',
+                            isLoading: false
+                        })
+                        return false
+                    }
+                } catch {
+                    set({
+                        error: 'Error de conexión con Google',
+                        isLoading: false
+                    })
+                    return false
+                }
+            },
+
+            // Acción: Login con Outlook/Microsoft
+            loginOutlook: async (token: string) => {
+                set({ isLoading: true, error: null })
+
+                try {
+                    console.log('🔐 Enviando token al backend...')
+
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/outlook`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ token }),
+                    })
+
+                    const data: AuthResponse = await response.json()
+                    console.log('📡 Respuesta del backend:', data)
+
+                    if (response.ok && data.ok && data.usuario) {
+                        const user = mapBackendUserToUser(data.usuario)
+
+                        set({
+                            user,
+                            isAuthenticated: true,
+                            isLoading: false,
+                            error: null
+                        })
+
+                        // Guardar en cookies
+                        if (data.token) {
+                            cookieUtils.set('matuc_token', data.token)
+                            cookieUtils.set('matuc_role', user.role)
+                            cookieUtils.set('matuc_user', JSON.stringify({
+                                uid: user.uid,
+                                nombre: user.nombre,
+                                email: user.email
+                            }))
+                        }
+
+                        console.log('✅ Login Outlook exitoso:', getUserDisplayName(user))
+                        return true
+
+                    } else {
+                        console.error('❌ Error del backend:', data.message)
+                        set({
+                            error: data.message || 'Error de autenticación con Outlook',
+                            isLoading: false
+                        })
+                        return false
+                    }
+                } catch (error) {
+                    console.error('❌ Error de red:', error)
+                    set({
+                        error: 'Error de conexión. Verifica tu internet e intenta de nuevo.',
+                        isLoading: false
+                    })
+                    return false
+                }
+            },
+
+            // Acción: Logout
+            logout: async () => {
+                // Limpiar cookies
+                cookieUtils.remove('matuc_token')
+                cookieUtils.remove('matuc_role')
+                cookieUtils.remove('matuc_user')
+
+                // Limpiar estado
+                set({
+                    user: null,
+                    isAuthenticated: false,
+                    isLoading: false,
+                    error: null
+                })
+
+                console.log('👋 Logout completado')
+            },
+
+            // Acción: Verificar autenticación existente
+            checkAuth: async () => {
+                set({ isLoading: true })
+
+                try {
+                    const token = cookieUtils.get('matuc_token')
 
                     if (!token) {
                         set({
-                            isLoading: false,
+                            user: null,
                             isAuthenticated: false,
-                            user: null
+                            isLoading: false
                         })
                         return
                     }
 
-                    set({ isLoading: true })
+                    // Verificar token con backend
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        },
+                    })
 
-                    try {
-                        // Usar tu endpoint de verificación existente
-                        const response = await fetch('/api/auth/me', {
-                            headers: { 'Authorization': `Bearer ${token}` },
-                        })
+                    if (response.ok) {
+                        const data: AuthResponse = await response.json()
 
-                        const data = await response.json()
-
-                        if (response.ok && data.ok) {
-                            const user: User = {
-                                uid: data.usuario.uid,
-                                nombre: data.usuario.nombre,
-                                apellido: data.usuario.apellido,
-                                email: data.usuario.email,
-                                admin: data.usuario.admin,
-                                role: data.usuario.admin ? 'administrador' : 'estudiante',
-                                conectado: true,
-                                ultimaConexion: new Date()
-                            }
+                        if (data.ok && data.usuario) {
+                            const user = mapBackendUserToUser(data.usuario)
 
                             set({
                                 user,
@@ -298,114 +276,56 @@ export const useAuthStore = create<AuthStore>()(
                                 isLoading: false,
                                 error: null
                             })
-                        } else {
-                            // Token inválido
-                            localStorage.removeItem('matuc_token')
 
-                            set({
-                                user: null,
-                                isAuthenticated: false,
-                                isLoading: false,
-                                error: null
-                            })
+                            console.log('✅ Sesión restaurada:', user.email)
+                            return
                         }
-                    } catch (error) {
-                        console.error('Error verificando auth:', error)
-
-                        set({
-                            isLoading: false,
-                            error: 'Error de verificación'
-                        })
                     }
-                },
 
-                // Acciones de estado directo
-                setUser: (user: User | null) => {
+                    // Token inválido - limpiar
+                    console.log('❌ Token inválido, limpiando sesión')
+                    cookieUtils.remove('matuc_token')
+                    cookieUtils.remove('matuc_role')
+                    cookieUtils.remove('matuc_user')
+
                     set({
-                        user,
-                        isAuthenticated: !!user
+                        user: null,
+                        isAuthenticated: false,
+                        isLoading: false
                     })
-                },
 
-                setLoading: (loading: boolean) => {
-                    set({ isLoading: loading })
-                },
+                } catch (error) {
+                    console.error('❌ Error verificando auth:', error)
+                    set({
+                        user: null,
+                        isAuthenticated: false,
+                        isLoading: false
+                    })
+                }
+            },
 
-                setError: (error: string | null) => {
-                    set({ error })
-                },
+            // Acciones de estado
+            setUser: (user) => set({ user }),
+            setLoading: (loading) => set({ isLoading: loading }),
+            setError: (error) => set({ error }),
+            clearError: () => set({ error: null }),
 
-                clearError: () => {
-                    set({ error: null })
-                },
+            // Utilidades con tipos centralizados
+            hasPermission: (permission: string) => {
+                const { user } = get()
+                return user ? hasPermission(user, permission) : false
+            },
 
-                // Utilidad: Verificar permisos por rol
-                hasPermission: (permission: string) => {
-                    const { user } = get()
-                    if (!user) return false
+            canAccessRoute: (route: string) => {
+                const { user } = get()
+                return user ? canUserAccessRoute(user, route) : false
+            },
 
-                    // Admin tiene todos los permisos
-                    if (user.admin || user.role === 'administrador') return true
-
-                    // Mapa de permisos por rol
-                    const rolePermissions = {
-                        estudiante: [
-                            'read_content',
-                            'submit_exercises',
-                            'view_progress'
-                        ],
-                        ayudante: [
-                            'read_content',
-                            'submit_exercises',
-                            'moderate_chat',
-                            'help_students'
-                        ],
-                        profesor: [
-                            'read_content',
-                            'create_content',
-                            'manage_students',
-                            'view_analytics',
-                            'create_exercises'
-                        ],
-                        profesor_editor: [
-                            'read_content',
-                            'create_content',
-                            'edit_content',
-                            'manage_students',
-                            'view_analytics',
-                            'create_exercises',
-                            'edit_any_content'
-                        ],
-                        administrador: ['*'] // Todos los permisos
-                    }
-
-                    const userPermissions = rolePermissions[user.role] || []
-                    return userPermissions.includes(permission) || userPermissions.includes('*')
-                },
-
-                // Utilidad: Verificar rol específico
-                isRole: (role: string) => {
-                    const { user } = get()
-                    return user?.role === role
-                },
-
-                // Utilidad: Nombre completo para display
-                getDisplayName: () => {
-                    const { user } = get()
-                    if (!user) return 'Usuario'
-                    return `${user.nombre} ${user.apellido}`.trim()
-                },
-
-            }),
-            {
-                name: 'matuc-auth-store',
-                // Solo persistir datos esenciales
-                partialize: (state) => ({
-                    user: state.user,
-                    isAuthenticated: state.isAuthenticated,
-                }),
+            getDisplayName: () => {
+                const { user } = get()
+                return user ? getUserDisplayName(user) : ''
             }
-        ),
+        }),
         {
             name: 'matuc-auth-store',
             enabled: process.env.NODE_ENV === 'development'
@@ -431,7 +351,7 @@ export const useAuth = () => {
 
         // Utilidades
         hasPermission: store.hasPermission,
-        isRole: store.isRole,
+        canAccessRoute: store.canAccessRoute,
         displayName: store.getDisplayName(),
 
         // Acciones de estado
@@ -440,26 +360,10 @@ export const useAuth = () => {
 }
 
 // Hook específico para datos del usuario (optimizado)
-export const useUser = () => {
-    return useAuthStore((state) => state.user)
-}
+export const useUser = () => useAuthStore((state) => state.user)
 
 // Hook para loading state (optimizado)
-export const useAuthLoading = () => {
-    return useAuthStore((state) => state.isLoading)
-}
+export const useAuthLoading = () => useAuthStore((state) => state.isLoading)
 
 // Hook para errores (optimizado)
-export const useAuthError = () => {
-    return useAuthStore((state) => state.error)
-}
-
-// Hook para verificar permisos específicos
-export const usePermission = (permission: string) => {
-    return useAuthStore((state) => state.hasPermission(permission))
-}
-
-// Hook para verificar rol específico
-export const useRole = (role: string) => {
-    return useAuthStore((state) => state.isRole(role))
-}
+export const useAuthError = () => useAuthStore((state) => state.error)

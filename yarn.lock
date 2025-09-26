@@ -7,6 +7,23 @@
   resolved "https://registry.npmjs.org/@alloc/quick-lru/-/quick-lru-5.2.0.tgz"
   integrity sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==
 
+"@azure/msal-browser@^4.24.0":
+  version "4.24.0"
+  resolved "https://registry.yarnpkg.com/@azure/msal-browser/-/msal-browser-4.24.0.tgz#4d2d6571268a8a49ae6164c1fc1999e56060befa"
+  integrity sha512-BNoiUEx4olj16U9ZiquvIhG1dZBnwWSzSXiSclq/9qiFQXYeLOKqEaEv98+xLXJ3oLw9APwHTR1eY2Qk0v6XBQ==
+  dependencies:
+    "@azure/msal-common" "15.13.0"
+
+"@azure/msal-common@15.13.0":
+  version "15.13.0"
+  resolved "https://registry.yarnpkg.com/@azure/msal-common/-/msal-common-15.13.0.tgz#229008f8badbf5af6a446a0be1c436be2f4c8cd9"
+  integrity sha512-8oF6nj02qX7eE/6+wFT5NluXRHc05AgdCC3fJnkjiJooq8u7BcLmxaYYSwc2AfEkWRMRi6Eyvvbeqk4U4412Ag==
+
+"@azure/msal-react@^3.0.20":
+  version "3.0.20"
+  resolved "https://registry.yarnpkg.com/@azure/msal-react/-/msal-react-3.0.20.tgz#c004b66a93d6801d40af7f60264ea6e692cfa9f6"
+  integrity sha512-+mlGe5rzJDe1Feb0BcPwCkcRTIXAUX0mxBnP8hDuzIXrwBAT/iHHl6wcsZ5iKBnMuqOicJhGX5l2/Iwqguom0Q==
+
 "@babel/runtime@^7.26.10":
   version "7.28.4"
   resolved "https://registry.npmjs.org/@babel/runtime/-/runtime-7.28.4.tgz"

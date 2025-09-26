@@ -1,10 +1,12 @@
-// src/app/(auth)/login/page.tsx - Login MATUC v4 ARREGLADO
+// src/app/(auth)/login/page.tsx - Login MATUC v4 con MSAL integrado
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { Mail, Lock, ArrowRight, ArrowLeft, Eye, EyeOff, Sparkles, Shield, CheckCircle } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '@/lib/stores/auth.store'
+import { useMsal } from '@azure/msal-react'
+import { loginRequest } from '@/lib/config/msal.config'
 import Link from 'next/link'
 
 // Componente de partículas de fondo más sutil
@@ -40,20 +42,63 @@ export default function LoginPage() {
   const [loginMethod, setLoginMethod] = useState<'outlook' | 'google' | 'credentials' | null>(null)
   const { login, loginGoogle, loginOutlook, isLoading, error, clearError } = useAuth()
 
+  // Hook de MSAL
+  const { instance } = useMsal()
+
   const handleOAuthLogin = async (provider: 'google' | 'outlook') => {
     clearError()
-    
-    // TODO: Implementar OAuth real
+
     try {
       if (provider === 'outlook') {
-        // await loginOutlook('mock_outlook_token')
-        console.log('OAuth Outlook iniciado')
-      } else {
-        // await loginGoogle('mock_google_token')
-        console.log('OAuth Google iniciado')
+        console.log('🔐 Iniciando login con Outlook UC...')
+
+        // 1. Iniciar login con MSAL
+        const loginResponse = await instance.loginPopup(loginRequest)
+
+        if (loginResponse.accessToken) {
+          console.log('✅ Token de Outlook obtenido')
+
+          // 2. Enviar token a nuestro backend
+          const success = await loginOutlook(loginResponse.accessToken)
+
+          if (success) {
+            console.log('✅ Login exitoso, redirigiendo...')
+            // La redirección será manejada por el AuthProvider/Zustand
+          } else {
+            console.error('❌ Error en autenticación con backend')
+          }
+        } else {
+          throw new Error('No se pudo obtener token de acceso')
+        }
+
+      } else if (provider === 'google') {
+        // TODO: Implementar Google OAuth si es necesario
+        console.log('⚠️ Google OAuth no implementado aún')
+        throw new Error('Google OAuth no disponible')
       }
-    } catch (error) {
-      console.error(`Error con ${provider}:`, error)
+    } catch (error: unknown) {
+      console.error(`❌ Error con ${provider}:`, error)
+
+      // Manejo de errores específicos de MSAL
+      if (error && typeof error === 'object' && 'errorCode' in error) {
+        if (error.errorCode === 'user_cancelled') {
+          console.log('ℹ️ Usuario canceló el login')
+          return // No mostrar error si el usuario canceló
+        }
+
+        if (error.errorCode === 'popup_window_error') {
+          console.error('❌ Error de popup, intentando con redirect...')
+          // Fallback a redirect si el popup falla
+          try {
+            await instance.loginRedirect(loginRequest)
+          } catch (redirectError) {
+            console.error('❌ También falló redirect:', redirectError)
+          }
+          return
+        }
+      }
+
+      // Para otros errores, se mostrará automáticamente por el estado del store
     }
   }
 
@@ -63,13 +108,13 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-uc-azul via-uc-azul/95 to-uc-celeste flex items-center justify-center p-4 relative overflow-hidden">
-      
+
       {/* Partículas de fondo */}
       <LoginParticles />
 
       {/* Container principal - UNA SOLA COLUMNA para evitar problemas responsive */}
       <div className="w-full max-w-md relative z-10">
-        
+
         {/* Logo y título principal */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -77,13 +122,13 @@ export default function LoginPage() {
           className="text-center mb-8"
         >
           <Link href="/" className="inline-flex items-center space-x-3 mb-6 group">
-            <motion.div 
+            <motion.div
               className="bg-white/20 backdrop-blur-sm rounded-xl p-3"
               whileHover={{ rotate: 360 }}
               transition={{ duration: 0.7 }}
             >
               <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
               </svg>
             </motion.div>
             <div>
@@ -95,7 +140,7 @@ export default function LoginPage() {
           <h1 className="text-3xl lg:text-4xl font-bold text-white mb-4">
             Bienvenido de <span className="text-uc-amarillo">Vuelta</span>
           </h1>
-          
+
           <p className="text-white/80 mb-6 leading-relaxed">
             Tu aula virtual de matemáticas te está esperando
           </p>
@@ -114,7 +159,7 @@ export default function LoginPage() {
               <Shield className="w-4 h-4 text-uc-amarillo" />
               <span className="text-uc-amarillo text-sm font-semibold">Login Seguro UC</span>
             </div>
-            
+
             <h2 className="text-xl font-bold text-white mb-1">Elige tu método de acceso</h2>
             <p className="text-white/60 text-sm">Rápido, seguro y sin complicaciones</p>
           </div>
@@ -180,10 +225,10 @@ export default function LoginPage() {
               <div className="flex items-center space-x-3">
                 <div className="bg-gradient-to-br from-red-500 to-yellow-500 rounded-lg p-2 flex-shrink-0">
                   <svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                   </svg>
                 </div>
                 <div className="text-left min-w-0">
@@ -238,7 +283,7 @@ export default function LoginPage() {
             <p className="text-white/50 text-xs leading-relaxed">
               ¿Primera vez? Tu cuenta se creará automáticamente
             </p>
-            
+
             <div className="flex items-center justify-center space-x-4 text-xs text-white/40">
               <span>🔒 Seguro</span>
               <span>•</span>
@@ -289,9 +334,9 @@ function CredentialsForm({ onBack }: { onBack: () => void }) {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     clearError()
-    
+
     const success = await login(formData.email, formData.password)
-    
+
     if (success) {
       console.log('Login exitoso')
     }
@@ -304,7 +349,7 @@ function CredentialsForm({ onBack }: { onBack: () => void }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-uc-azul via-uc-azul/95 to-uc-celeste flex items-center justify-center p-4 relative overflow-hidden">
-      
+
       <LoginParticles />
 
       <div className="w-full max-w-md relative z-10">
@@ -315,13 +360,13 @@ function CredentialsForm({ onBack }: { onBack: () => void }) {
           className="text-center mb-6"
         >
           <Link href="/" className="inline-flex items-center space-x-3 mb-4 group">
-            <motion.div 
+            <motion.div
               className="bg-white/20 backdrop-blur-sm rounded-xl p-3"
               whileHover={{ rotate: 360 }}
               transition={{ duration: 0.7 }}
             >
               <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
               </svg>
             </motion.div>
             <div>
@@ -350,7 +395,7 @@ function CredentialsForm({ onBack }: { onBack: () => void }) {
               <Lock className="w-3 h-3 text-uc-amarillo" />
               <span className="text-uc-amarillo text-xs font-semibold">Login Tradicional</span>
             </div>
-            
+
             <h1 className="text-2xl font-bold text-white mb-1">Iniciar Sesión</h1>
             <p className="text-white/70 text-sm">Ingresa tus credenciales UC</p>
           </div>
@@ -472,7 +517,7 @@ function CredentialsForm({ onBack }: { onBack: () => void }) {
                 Recupérala aquí
               </button>
             </p>
-            
+
             <div className="pt-3 border-t border-white/20">
               <p className="text-white/40 text-xs">
                 🔒 Conexión segura • 🛡️ Datos protegidos
