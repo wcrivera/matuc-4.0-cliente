@@ -1,4 +1,4 @@
-// src/types/user.types.ts - Tipos centralizados de usuario
+// src/types/user.types.ts - Tipos centralizados de usuario CONSOLIDADOS
 export type UserRole =
     | 'estudiante'
     | 'ayudante'
@@ -24,7 +24,60 @@ export interface User {
     activo?: boolean
 }
 
-// Estados de autenticación
+// ==========================================
+// INTERFACES OUTLOOK (mantener compatibilidad)
+// ==========================================
+export interface UserOutlook {
+    id: string,
+    mail: string,
+    givenName: string,
+    surname: string,
+    userPrincipalName: string,
+    jobTitle: string,
+}
+
+// ==========================================
+// INTERFACES BACKEND LEGACY (compatibilidad)
+// ==========================================
+export interface Usuario {
+    _id: string;
+    nombre: string;
+    apellido: string;
+    email: string;
+    admin: boolean;
+    rol: UserRole;  // Usar el tipo unificado
+    createdAt: Date;
+    ultimaConexion?: Date;
+    conectado?: boolean;
+    // Campos adicionales opcionales
+    telefono?: string;
+    foto?: string;
+    departamento?: string;
+    cargo?: string;
+}
+
+export interface UserResponse {
+    uid: string;
+    nombre: string;
+    apellido: string;
+    email: string;
+    admin: boolean;
+    rol: UserRole;  // Usar el tipo unificado
+    createdAt?: Date;
+    ultimaConexion?: Date;
+}
+
+export interface CreateUserRequest {
+    email: string;
+    nombre: string;
+    apellido: string;
+    admin?: boolean;
+    rol?: UserRole;  // Usar el tipo unificado
+}
+
+// ==========================================
+// ESTADOS DE AUTENTICACIÓN
+// ==========================================
 export interface AuthState {
     user: User | null
     isAuthenticated: boolean
@@ -53,7 +106,9 @@ export interface BackendUser {
     // Otros campos que pueda tener el backend
 }
 
-// Permisos y roles
+// ==========================================
+// PERMISOS Y ROLES
+// ==========================================
 export interface Permission {
     id: string
     name: string
@@ -67,7 +122,7 @@ export interface RolePermissions {
     redirectTo: string  // Ruta por defecto tras login
 }
 
-// Configuración de roles
+// Configuración de roles COMPLETA con administrador
 export const ROLE_CONFIG: Record<UserRole, RolePermissions> = {
     estudiante: {
         role: 'estudiante',
@@ -88,7 +143,7 @@ export const ROLE_CONFIG: Record<UserRole, RolePermissions> = {
             { id: 'view_basic_analytics', name: 'Analytics básicas', description: 'Puede ver estadísticas básicas' }
         ],
         canAccess: ['/dashboard', '/courses', '/classroom', '/analytics'],
-        redirectTo: '/classroom'
+        redirectTo: '/dashboard'
     },
     profesor: {
         role: 'profesor',
@@ -99,7 +154,7 @@ export const ROLE_CONFIG: Record<UserRole, RolePermissions> = {
             { id: 'manage_students', name: 'Gestionar estudiantes', description: 'Puede gestionar estudiantes' }
         ],
         canAccess: ['/dashboard', '/courses', '/exercises', '/analytics', '/classroom'],
-        redirectTo: '/courses'
+        redirectTo: '/dashboard'
     },
     profesor_editor: {
         role: 'profesor_editor',
@@ -111,7 +166,7 @@ export const ROLE_CONFIG: Record<UserRole, RolePermissions> = {
             { id: 'manage_students', name: 'Gestionar estudiantes', description: 'Puede gestionar estudiantes' }
         ],
         canAccess: ['/dashboard', '/courses', '/exercises', '/analytics', '/classroom'],
-        redirectTo: '/courses'
+        redirectTo: '/dashboard'
     },
     administrador: {
         role: 'administrador',
@@ -126,7 +181,9 @@ export const ROLE_CONFIG: Record<UserRole, RolePermissions> = {
     }
 }
 
-// Utilidades de tipos
+// ==========================================
+// UTILIDADES DE TIPOS
+// ==========================================
 export function mapBackendUserToUser(backendUser: BackendUser): User {
     return {
         uid: backendUser.uid,
