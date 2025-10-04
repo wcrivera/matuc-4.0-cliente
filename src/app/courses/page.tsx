@@ -213,7 +213,7 @@ export default function CoursesPage() {
                         </p>
                     </div>
                     <Link
-                        href="/courses/new"
+                        href="/courses/create"
                         className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
                     >
                         + Nuevo Curso
@@ -280,7 +280,7 @@ export default function CoursesPage() {
                                     }
                                 </p>
                                 <Link
-                                    href="/dashboard/courses/new"
+                                    href="/courses/create"
                                     className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                                 >
                                     Crear primer curso

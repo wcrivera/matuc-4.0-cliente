@@ -10,6 +10,7 @@ import type {
     ActualizarCursoRequest,
     CursoPaginacion
 } from '@/types/course.types';
+import { string } from 'zod';
 
 // ==========================================
 // 🌐 API CLIENT FUNCTIONS
@@ -99,8 +100,6 @@ export const useCourseStore = create<CursoStore>()(
 
                     const token = cookieUtils.get('matuc_token') || '';
 
-                    console.log(token)
-
                     const response = await fetch(`${API_BASE_URL}/api/curso`, {
                         method: 'GET',
                         headers: { 'x-token': token },
@@ -140,22 +139,19 @@ export const useCourseStore = create<CursoStore>()(
             // 📄 OBTENER CURSO ESPECÍFICO
             // ==========================================
             obtenerCurso: async (cid: string) => {
+
+                // console.log(cid)
                 
                 set({ isLoading: true, error: null });
 
                 try {
-                    // const response = await fetch(`${API_BASE_URL}/api/curso/${cid}`, {
-                    //     headers: getAuthHeaders(),
-                    // });
 
-                    const token = cookieUtils.get('matuc_token');
 
-                    console.log(token)
+                    const token = cookieUtils.get('matuc_token') || '';
 
                     const response = await fetch(`${API_BASE_URL}/api/curso/${cid}`, {
                         method: 'GET',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ token }),
+                        headers: { 'x-token': token },
                     });
 
                     const data = await handleApiResponse<{
@@ -189,6 +185,8 @@ export const useCourseStore = create<CursoStore>()(
                         headers: getAuthHeaders(),
                         body: JSON.stringify(datos),
                     });
+
+                    console.log(response)
 
                     const result = await handleApiResponse<{
                         ok: boolean;
