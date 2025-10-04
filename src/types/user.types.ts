@@ -1,11 +1,13 @@
-// src/types/user.types.ts - Tipos centralizados de usuario CONSOLIDADOS
-export type UserRole =
-    | 'estudiante'
-    | 'ayudante'
-    | 'profesor'
-    | 'profesor_editor'
-    | 'administrador'
+// ==========================================
+// src/types/user.types.ts - TIPOS UNIFICADOS Y LIMPIOS
+// ==========================================
 
+// DEFINICIÓN ÚNICA Y DEFINITIVA DE UserRole
+export type UserRole = 'estudiante' | 'ayudante' | 'profesor' | 'profesor_editor' | 'administrador';
+
+// ==========================================
+// INTERFACE USER PRINCIPAL
+// ==========================================
 export interface User {
     uid: string
     nombre: string
@@ -45,7 +47,7 @@ export interface Usuario {
     apellido: string;
     email: string;
     admin: boolean;
-    rol: UserRole;  // Usar el tipo unificado
+    rol: UserRole;
     createdAt: Date;
     ultimaConexion?: Date;
     conectado?: boolean;
@@ -62,7 +64,7 @@ export interface UserResponse {
     apellido: string;
     email: string;
     admin: boolean;
-    rol: UserRole;  // Usar el tipo unificado
+    rol: UserRole;
     createdAt?: Date;
     ultimaConexion?: Date;
 }
@@ -72,7 +74,7 @@ export interface CreateUserRequest {
     nombre: string;
     apellido: string;
     admin?: boolean;
-    rol?: UserRole;  // Usar el tipo unificado
+    rol?: UserRole;
 }
 
 // ==========================================
@@ -85,7 +87,6 @@ export interface AuthState {
     error: string | null
 }
 
-// Respuestas del backend
 export interface AuthResponse {
     ok: boolean
     message: string
@@ -93,7 +94,6 @@ export interface AuthResponse {
     token?: string
 }
 
-// Formato de usuario que viene del backend (para mapear)
 export interface BackendUser {
     uid: string
     nombre: string
@@ -103,7 +103,6 @@ export interface BackendUser {
     ultimaConexion?: string | Date
     conectado?: boolean
     activo?: boolean
-    // Otros campos que pueda tener el backend
 }
 
 // ==========================================
@@ -118,11 +117,11 @@ export interface Permission {
 export interface RolePermissions {
     role: UserRole
     permissions: Permission[]
-    canAccess: string[] // Rutas que puede acceder
-    redirectTo: string  // Ruta por defecto tras login
+    canAccess: string[]
+    redirectTo: string
 }
 
-// Configuración de roles COMPLETA con administrador
+// CONFIGURACIÓN COMPLETA DE ROLES
 export const ROLE_CONFIG: Record<UserRole, RolePermissions> = {
     estudiante: {
         role: 'estudiante',
@@ -132,7 +131,7 @@ export const ROLE_CONFIG: Record<UserRole, RolePermissions> = {
             { id: 'view_progress', name: 'Ver progreso', description: 'Puede ver su progreso' }
         ],
         canAccess: ['/dashboard', '/courses', '/exercises', '/progress'],
-        redirectTo: '/dashboard'
+        redirectTo: '/courses'
     },
     ayudante: {
         role: 'ayudante',
@@ -143,7 +142,7 @@ export const ROLE_CONFIG: Record<UserRole, RolePermissions> = {
             { id: 'view_basic_analytics', name: 'Analytics básicas', description: 'Puede ver estadísticas básicas' }
         ],
         canAccess: ['/dashboard', '/courses', '/classroom', '/analytics'],
-        redirectTo: '/dashboard'
+        redirectTo: '/courses'
     },
     profesor: {
         role: 'profesor',
@@ -154,7 +153,7 @@ export const ROLE_CONFIG: Record<UserRole, RolePermissions> = {
             { id: 'manage_students', name: 'Gestionar estudiantes', description: 'Puede gestionar estudiantes' }
         ],
         canAccess: ['/dashboard', '/courses', '/exercises', '/analytics', '/classroom'],
-        redirectTo: '/dashboard'
+        redirectTo: '/courses'
     },
     profesor_editor: {
         role: 'profesor_editor',
@@ -166,7 +165,7 @@ export const ROLE_CONFIG: Record<UserRole, RolePermissions> = {
             { id: 'manage_students', name: 'Gestionar estudiantes', description: 'Puede gestionar estudiantes' }
         ],
         canAccess: ['/dashboard', '/courses', '/exercises', '/analytics', '/classroom'],
-        redirectTo: '/dashboard'
+        redirectTo: '/courses'
     },
     administrador: {
         role: 'administrador',
@@ -177,7 +176,7 @@ export const ROLE_CONFIG: Record<UserRole, RolePermissions> = {
             { id: 'manage_permissions', name: 'Gestionar permisos', description: 'Puede asignar roles y permisos' }
         ],
         canAccess: ['/admin', '/dashboard', '/courses', '/exercises', '/analytics', '/classroom'],
-        redirectTo: '/admin'
+        redirectTo: '/courses'
     }
 }
 
@@ -191,7 +190,7 @@ export function mapBackendUserToUser(backendUser: BackendUser): User {
         apellido: backendUser.apellido,
         email: backendUser.email,
         admin: backendUser.admin,
-        role: backendUser.admin ? 'administrador' : 'estudiante', // Por defecto, se puede mejorar
+        role: backendUser.admin ? 'administrador' : 'estudiante',
         conectado: backendUser.conectado ?? true,
         ultimaConexion: backendUser.ultimaConexion
             ? new Date(backendUser.ultimaConexion)

@@ -70,103 +70,104 @@ export const useAuthStore = create<AuthStore>()(
             error: null,
 
             // Acción: Login tradicional email/password
-            login: async (email: string, password: string) => {
-                set({ isLoading: true, error: null })
+            // login: async (email: string, password: string) => {
+            //     set({ isLoading: true, error: null })
 
-                try {
-                    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email, password }),
-                    })
+            //     try {
+            //         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
+            //             method: 'POST',
+            //             headers: { 'Content-Type': 'application/json' },
+            //             body: JSON.stringify({ email, password }),
+            //         })
 
-                    const data: AuthResponse = await response.json()
+            //         const data: AuthResponse = await response.json()
 
-                    if (response.ok && data.ok && data.usuario) {
-                        const user = mapBackendUserToUser(data.usuario)
+            //         if (response.ok && data.ok && data.usuario) {
+            //             const user = mapBackendUserToUser(data.usuario)
 
-                        set({
-                            user,
-                            isAuthenticated: true,
-                            isLoading: false,
-                            error: null
-                        })
+            //             set({
+            //                 user,
+            //                 isAuthenticated: true,
+            //                 isLoading: false,
+            //                 error: null
+            //             })
 
-                        // Guardar en cookies
-                        if (data.token) {
-                            cookieUtils.set('matuc_token', data.token)
-                            cookieUtils.set('matuc_role', user.role)
-                            cookieUtils.set('matuc_user', JSON.stringify({
-                                uid: user.uid,
-                                nombre: user.nombre,
-                                email: user.email
-                            }))
-                        }
+            //             // Guardar en cookies
+            //             if (data.token) {
+            //                 cookieUtils.set('matuc_token', data.token)
+            //                 cookieUtils.set('matuc_role', user.role)
+            //                 cookieUtils.set('matuc_user', JSON.stringify({
+            //                     uid: user.uid,
+            //                     nombre: user.nombre,
+            //                     email: user.email
+            //                 }))
+            //             }
 
-                        return true
-                    } else {
-                        set({
-                            error: data.message || 'Error de autenticación',
-                            isLoading: false
-                        })
-                        return false
-                    }
-                } catch {
-                    set({
-                        error: 'Error de conexión',
-                        isLoading: false
-                    })
-                    return false
-                }
-            },
+            //             return true
+            //         } else {
+            //             set({
+            //                 error: data.message || 'Error de autenticación',
+            //                 isLoading: false
+            //             })
+            //             return false
+            //         }
+            //     } catch {
+            //         set({
+            //             error: 'Error de conexión',
+            //             isLoading: false
+            //         })
+            //         return false
+            //     }
+            // },
 
             // Acción: Login con Google
-            loginGoogle: async (token: string) => {
-                set({ isLoading: true, error: null })
+            // loginGoogle: async (token: string) => {
+            //     set({ isLoading: true, error: null })
 
-                try {
-                    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ token }),
-                    })
+            //     try {
+            //         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`, {
+            //             method: 'POST',
+            //             headers: { 'Content-Type': 'application/json' },
+            //             body: JSON.stringify({ token }),
+            //         })
 
-                    const data: AuthResponse = await response.json()
+            //         const data: AuthResponse = await response.json()
 
-                    if (response.ok && data.ok && data.usuario) {
-                        const user = mapBackendUserToUser(data.usuario)
+            //         if (response.ok && data.ok && data.usuario) {
+            //             const user = mapBackendUserToUser(data.usuario)
 
-                        set({
-                            user,
-                            isAuthenticated: true,
-                            isLoading: false,
-                            error: null
-                        })
+            //             set({
+            //                 user,
+            //                 isAuthenticated: true,
+            //                 isLoading: false,
+            //                 error: null
+            //             })
 
-                        if (data.token) {
-                            cookieUtils.set('matuc_token', data.token)
-                            cookieUtils.set('matuc_role', user.role)
-                        }
+            //             if (data.token) {
+            //                 cookieUtils.set('matuc_token', data.token)
+            //                 cookieUtils.set('matuc_role', user.role)
+            //             }
 
-                        return true
-                    } else {
-                        set({
-                            error: data.message || 'Error con Google',
-                            isLoading: false
-                        })
-                        return false
-                    }
-                } catch {
-                    set({
-                        error: 'Error de conexión con Google',
-                        isLoading: false
-                    })
-                    return false
-                }
-            },
+            //             return true
+            //         } else {
+            //             set({
+            //                 error: data.message || 'Error con Google',
+            //                 isLoading: false
+            //             })
+            //             return false
+            //         }
+            //     } catch {
+            //         set({
+            //             error: 'Error de conexión con Google',
+            //             isLoading: false
+            //         })
+            //         return false
+            //     }
+            // },
 
             // Acción: Login con Outlook/Microsoft
             loginOutlook: async (token: string) => {
+                console.log(token)
                 set({ isLoading: true, error: null })
 
                 try {

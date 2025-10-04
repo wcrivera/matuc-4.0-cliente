@@ -66,9 +66,10 @@ async function verifyAuthToken(token: string): Promise<User | null> {
     }
 }
 
-// Función para verificar permisos de rol
+// Función para verificar permisos de rol - CORREGIDA
 function hasRolePermission(user: User, pathname: string): boolean {
-    const role = user.role as UserRole  // Forzar tipo explícito
+    // Usar object destructuring para evitar restricción de tipos
+    const { role } = user
 
     // Administradores tienen acceso a todo
     if (role === 'administrador') {
@@ -77,7 +78,9 @@ function hasRolePermission(user: User, pathname: string): boolean {
 
     // Verificar rutas específicas de admin
     if (matchesRoute(pathname, PROTECTED_ROUTES.ADMIN_ONLY)) {
-        return role === 'administrador'
+        const allowedRoles: UserRole[] = ['administrador']
+        return allowedRoles.includes(role)
+        // return role === 'administrador' ? false : true // Solo admin puede acceder
     }
 
     // Verificar rutas de profesores
@@ -176,11 +179,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
 }
 
-// Función para determinar URL de redirección según rol
+// Función para determinar URL de redirección según rol - CORREGIDA
 function getUserRedirectUrl(role: UserRole): string {
-    const userRole = role as UserRole  // Asegurar tipo correcto
-
-    switch (userRole) {
+    // Usar el rol directamente sin casting adicional
+    switch (role) {
         case 'administrador':
             return '/admin'
         case 'profesor':

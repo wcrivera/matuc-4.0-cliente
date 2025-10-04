@@ -1,423 +1,424 @@
-// src/lib/stores/course.store.ts - Store Zustand para Gestión de Cursos
-'use client'
+import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
+import React from 'react';
+import type {
+    CursoStore,
+    Curso,
+    CursosQuery,
+    CursoFiltros,
+    CrearCursoRequest,
+    ActualizarCursoRequest,
+    CursoPaginacion
+} from '@/types/course.types';
 
-import { create } from 'zustand'
-import { devtools } from 'zustand/middleware'
+// ==========================================
+// 🌐 API CLIENT FUNCTIONS
+// ==========================================
 
-// Tipos
-export interface Course {
-    id: string
-    title: string
-    code: string
-    description: string
-    semester: string
-    year: number
-    professorId: string
-    professorName: string
-    studentsCount: number
-    status: 'active' | 'inactive' | 'archived'
-    createdAt: string
-    updatedAt: string
-}
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
-export interface CourseSection {
-    id: string
-    courseId: string
-    title: string
-    description: string
-    order: number
-    isPublished: boolean
-    exercises: Exercise[]
-}
-
-export interface Exercise {
-    id: string
-    sectionId: string
-    title: string
-    description: string
-    type: 'multiple_choice' | 'latex_input' | 'numerical' | 'proof'
-    latex: string
-    points: number
-    order: number
-    isPublished: boolean
-    createdAt: string
-}
-
-export interface CourseStats {
-    totalCourses: number
-    activeCourses: number
-    totalStudents: number
-    totalExercises: number
-    avgProgress: number
-}
-
-export interface CourseState {
-    // Estado
-    courses: Course[]
-    currentCourse: Course | null
-    sections: CourseSection[]
-    currentSection: CourseSection | null
-    exercises: Exercise[]
-    isLoading: boolean
-    error: string | null
-    stats: CourseStats | null
-
-    // Filtros
-    filters: {
-        search: string
-        semester: string
-        status: Course['status'] | 'all'
+const cookieUtils = {
+    set: (name: string, value: string, days = 7) => {
+        if (typeof document !== 'undefined') {
+            const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString()
+            document.cookie = `${name}=${value}; expires=${expires}; path=/; samesite=strict`
+        }
+    },
+    get: (name: string): string | null => {
+        if (typeof document === 'undefined') return null
+        const cookies = document.cookie.split(';').reduce((acc, cookie) => {
+            const [key, value] = cookie.trim().split('=')
+            acc[key] = value
+            return acc
+        }, {} as Record<string, string>)
+        return cookies[name] || null
+    },
+    remove: (name: string) => {
+        if (typeof document !== 'undefined') {
+            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/`
+        }
     }
-
-    // Acciones de cursos
-    setCourses: (courses: Course[]) => void
-    addCourse: (course: Course) => void
-    updateCourse: (id: string, updates: Partial<Course>) => void
-    removeCourse: (id: string) => void
-    setCurrentCourse: (course: Course | null) => void
-
-    // Acciones de secciones
-    setSections: (sections: CourseSection[]) => void
-    addSection: (section: CourseSection) => void
-    updateSection: (id: string, updates: Partial<CourseSection>) => void
-    removeSection: (id: string) => void
-    setCurrentSection: (section: CourseSection | null) => void
-    reorderSections: (sectionIds: string[]) => void
-
-    // Acciones de ejercicios
-    setExercises: (exercises: Exercise[]) => void
-    addExercise: (exercise: Exercise) => void
-    updateExercise: (id: string, updates: Partial<Exercise>) => void
-    removeExercise: (id: string) => void
-    reorderExercises: (exerciseIds: string[]) => void
-
-    // Acciones de estado
-    setLoading: (loading: boolean) => void
-    setError: (error: string | null) => void
-    setStats: (stats: CourseStats) => void
-
-    // Acciones de filtros
-    setSearch: (search: string) => void
-    setSemesterFilter: (semester: string) => void
-    setStatusFilter: (status: Course['status'] | 'all') => void
-    clearFilters: () => void
-
-    // Selectores computados
-    getFilteredCourses: () => Course[]
-    getCourseById: (id: string) => Course | undefined
-    getSectionsByCourse: (courseId: string) => CourseSection[]
-    getExercisesBySection: (sectionId: string) => Exercise[]
-    getPublishedSections: (courseId: string) => CourseSection[]
-    getTotalExercises: (courseId: string) => number
 }
 
-// Store principal de cursos
-export const useCourseStore = create<CourseState>()(
+// Helper para headers con auth
+function getAuthHeaders(): HeadersInit {
+    const token = cookieUtils.get('matuc_token');
+    return {
+        'Content-Type': 'application/json',
+        ...(token && { Authorization: `Bearer ${token}` })
+    };
+}
+
+// Helper para manejo de errores de API
+async function handleApiResponse<T>(response: Response): Promise<T> {
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+    }
+    return response.json();
+}
+
+// ==========================================
+// 🎯 ZUSTAND STORE CON IMMER
+// ==========================================
+
+export const useCourseStore = create<CursoStore>()(
     devtools(
-        (set, get) => ({
-            // Estado inicial
-            courses: [],
-            currentCourse: null,
-            sections: [],
-            currentSection: null,
-            exercises: [],
+        (set) => ({
+            // === ESTADO INICIAL ===
+            cursos: [],
+            cursoActual: null,
             isLoading: false,
             error: null,
-            stats: null,
+            pagination: null,
+            filtros: {},
 
-            filters: {
-                search: '',
-                semester: '',
-                status: 'all'
+            // ==========================================
+            // 📋 OBTENER CURSOS CON FILTROS Y PAGINACIÓN
+            // ==========================================
+            obtenerCursos: async (query?: CursosQuery) => {
+                set({ isLoading: true, error: null });
+
+                try {
+                    // Construir query params
+                    const params = new URLSearchParams();
+
+                    if (query?.categoria) params.append('categoria', query.categoria);
+                    if (query?.activo !== undefined) params.append('activo', query.activo.toString());
+                    if (query?.publico !== undefined) params.append('publico', query.publico.toString());
+                    if (query?.semestre) params.append('semestre', query.semestre);
+                    if (query?.año) params.append('año', query.año.toString());
+                    if (query?.search) params.append('search', query.search);
+                    if (query?.page) params.append('page', query.page.toString());
+                    if (query?.limit) params.append('limit', query.limit.toString());
+
+
+                    // const response = await fetch(`${API_BASE_URL}/api/curso`, {
+                    //     headers: getAuthHeaders(),
+                    // });
+
+                    const token = cookieUtils.get('matuc_token') || '';
+
+                    console.log(token)
+
+                    const response = await fetch(`${API_BASE_URL}/api/curso`, {
+                        method: 'GET',
+                        headers: { 'x-token': token },
+                    });
+
+                    const data = await handleApiResponse<{
+                        ok: boolean;
+                        cursos: Curso[];
+                        pagination: CursoPaginacion;
+                    }>(response);
+
+                    set((state) => ({
+                        cursos: data.cursos,
+                        pagination: data.pagination,
+                        isLoading: false,
+                        // Actualizar filtros aplicados
+                        filtros: query ? {
+                            categoria: query.categoria,
+                            activo: query.activo,
+                            publico: query.publico,
+                            semestre: query.semestre,
+                            año: query.año,
+                            search: query.search,
+                        } : state.filtros
+                    }));
+
+                } catch (error) {
+                    set({
+                        error: error instanceof Error ? error.message : 'Error al obtener cursos',
+                        isLoading: false
+                    });
+                    console.error('Error al obtener cursos:', error);
+                }
             },
 
-            // Acciones de cursos
-            setCourses: (courses) =>
-                set({ courses }, false, 'setCourses'),
+            // ==========================================
+            // 📄 OBTENER CURSO ESPECÍFICO
+            // ==========================================
+            obtenerCurso: async (cid: string) => {
+                
+                set({ isLoading: true, error: null });
 
-            addCourse: (course) =>
-                set(
-                    (state) => ({
-                        courses: [...state.courses, course]
-                    }),
-                    false,
-                    'addCourse'
-                ),
+                try {
+                    // const response = await fetch(`${API_BASE_URL}/api/curso/${cid}`, {
+                    //     headers: getAuthHeaders(),
+                    // });
 
-            updateCourse: (id, updates) =>
-                set(
-                    (state) => ({
-                        courses: state.courses.map(course =>
-                            course.id === id ? { ...course, ...updates } : course
+                    const token = cookieUtils.get('matuc_token');
+
+                    console.log(token)
+
+                    const response = await fetch(`${API_BASE_URL}/api/curso/${cid}`, {
+                        method: 'GET',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ token }),
+                    });
+
+                    const data = await handleApiResponse<{
+                        ok: boolean;
+                        curso: Curso;
+                    }>(response);
+
+                    set({
+                        cursoActual: data.curso,
+                        isLoading: false
+                    });
+
+                } catch (error) {
+                    set({
+                        error: error instanceof Error ? error.message : 'Error al obtener curso',
+                        isLoading: false
+                    });
+                    console.error('Error al obtener curso:', error);
+                }
+            },
+
+            // ==========================================
+            // ➕ CREAR CURSO
+            // ==========================================
+            crearCurso: async (datos: CrearCursoRequest): Promise<Curso | null> => {
+                set({ isLoading: true, error: null });
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/curso`, {
+                        method: 'POST',
+                        headers: getAuthHeaders(),
+                        body: JSON.stringify(datos),
+                    });
+
+                    const result = await handleApiResponse<{
+                        ok: boolean;
+                        curso: Curso;
+                        message: string;
+                    }>(response);
+
+                    set((state) => ({
+                        // Agregar el nuevo curso al inicio de la lista
+                        cursos: [result.curso, ...state.cursos],
+                        cursoActual: result.curso,
+                        isLoading: false
+                    }));
+
+                    return result.curso;
+
+                } catch (error) {
+                    set({
+                        error: error instanceof Error ? error.message : 'Error al crear curso',
+                        isLoading: false
+                    });
+                    console.error('Error al crear curso:', error);
+                    return null;
+                }
+            },
+
+            // ==========================================
+            // ✏️ ACTUALIZAR CURSO
+            // ==========================================
+            actualizarCurso: async (datos: ActualizarCursoRequest): Promise<Curso | null> => {
+                set({ isLoading: true, error: null });
+
+                try {
+                    const { cid, ...datosActualizar } = datos;
+
+                    const response = await fetch(`${API_BASE_URL}/api/curso/${cid}`, {
+                        method: 'PUT',
+                        headers: getAuthHeaders(),
+                        body: JSON.stringify(datosActualizar),
+                    });
+
+                    const result = await handleApiResponse<{
+                        ok: boolean;
+                        curso: Curso;
+                        message: string;
+                    }>(response);
+
+                    set((state) => ({
+                        // Actualizar en la lista
+                        cursos: state.cursos.map(curso =>
+                            curso.cid === cid ? result.curso : curso
                         ),
-                        currentCourse: state.currentCourse?.id === id
-                            ? { ...state.currentCourse, ...updates }
-                            : state.currentCourse
-                    }),
-                    false,
-                    'updateCourse'
-                ),
+                        // Actualizar curso actual si coincide
+                        cursoActual: state.cursoActual?.cid === cid ? result.curso : state.cursoActual,
+                        isLoading: false
+                    }));
 
-            removeCourse: (id) =>
-                set(
-                    (state) => ({
-                        courses: state.courses.filter(course => course.id !== id),
-                        currentCourse: state.currentCourse?.id === id ? null : state.currentCourse
-                    }),
-                    false,
-                    'removeCourse'
-                ),
+                    return result.curso;
 
-            setCurrentCourse: (course) =>
-                set({ currentCourse: course }, false, 'setCurrentCourse'),
-
-            // Acciones de secciones
-            setSections: (sections) =>
-                set({ sections }, false, 'setSections'),
-
-            addSection: (section) =>
-                set(
-                    (state) => ({
-                        sections: [...state.sections, section]
-                    }),
-                    false,
-                    'addSection'
-                ),
-
-            updateSection: (id, updates) =>
-                set(
-                    (state) => ({
-                        sections: state.sections.map(section =>
-                            section.id === id ? { ...section, ...updates } : section
-                        ),
-                        currentSection: state.currentSection?.id === id
-                            ? { ...state.currentSection, ...updates }
-                            : state.currentSection
-                    }),
-                    false,
-                    'updateSection'
-                ),
-
-            removeSection: (id) =>
-                set(
-                    (state) => ({
-                        sections: state.sections.filter(section => section.id !== id),
-                        currentSection: state.currentSection?.id === id ? null : state.currentSection
-                    }),
-                    false,
-                    'removeSection'
-                ),
-
-            setCurrentSection: (section) =>
-                set({ currentSection: section }, false, 'setCurrentSection'),
-
-            reorderSections: (sectionIds) =>
-                set(
-                    (state) => ({
-                        sections: sectionIds.map((id, index) => {
-                            const section = state.sections.find(s => s.id === id)
-                            return section ? { ...section, order: index } : null
-                        }).filter(Boolean) as CourseSection[]
-                    }),
-                    false,
-                    'reorderSections'
-                ),
-
-            // Acciones de ejercicios
-            setExercises: (exercises) =>
-                set({ exercises }, false, 'setExercises'),
-
-            addExercise: (exercise) =>
-                set(
-                    (state) => ({
-                        exercises: [...state.exercises, exercise]
-                    }),
-                    false,
-                    'addExercise'
-                ),
-
-            updateExercise: (id, updates) =>
-                set(
-                    (state) => ({
-                        exercises: state.exercises.map(exercise =>
-                            exercise.id === id ? { ...exercise, ...updates } : exercise
-                        )
-                    }),
-                    false,
-                    'updateExercise'
-                ),
-
-            removeExercise: (id) =>
-                set(
-                    (state) => ({
-                        exercises: state.exercises.filter(exercise => exercise.id !== id)
-                    }),
-                    false,
-                    'removeExercise'
-                ),
-
-            reorderExercises: (exerciseIds) =>
-                set(
-                    (state) => ({
-                        exercises: exerciseIds.map((id, index) => {
-                            const exercise = state.exercises.find(e => e.id === id)
-                            return exercise ? { ...exercise, order: index } : null
-                        }).filter(Boolean) as Exercise[]
-                    }),
-                    false,
-                    'reorderExercises'
-                ),
-
-            // Acciones de estado
-            setLoading: (isLoading) =>
-                set({ isLoading }, false, 'setLoading'),
-
-            setError: (error) =>
-                set({ error }, false, 'setError'),
-
-            setStats: (stats) =>
-                set({ stats }, false, 'setStats'),
-
-            // Acciones de filtros
-            setSearch: (search) =>
-                set(
-                    (state) => ({
-                        filters: { ...state.filters, search }
-                    }),
-                    false,
-                    'setSearch'
-                ),
-
-            setSemesterFilter: (semester) =>
-                set(
-                    (state) => ({
-                        filters: { ...state.filters, semester }
-                    }),
-                    false,
-                    'setSemesterFilter'
-                ),
-
-            setStatusFilter: (status) =>
-                set(
-                    (state) => ({
-                        filters: { ...state.filters, status }
-                    }),
-                    false,
-                    'setStatusFilter'
-                ),
-
-            clearFilters: () =>
-                set(
-                    {
-                        filters: {
-                            search: '',
-                            semester: '',
-                            status: 'all'
-                        }
-                    },
-                    false,
-                    'clearFilters'
-                ),
-
-            // Selectores computados
-            getFilteredCourses: () => {
-                const { courses, filters } = get()
-
-                return courses.filter(course => {
-                    const matchesSearch = !filters.search ||
-                        course.title.toLowerCase().includes(filters.search.toLowerCase()) ||
-                        course.code.toLowerCase().includes(filters.search.toLowerCase())
-
-                    const matchesSemester = !filters.semester ||
-                        course.semester === filters.semester
-
-                    const matchesStatus = filters.status === 'all' ||
-                        course.status === filters.status
-
-                    return matchesSearch && matchesSemester && matchesStatus
-                })
+                } catch (error) {
+                    set({
+                        error: error instanceof Error ? error.message : 'Error al actualizar curso',
+                        isLoading: false
+                    });
+                    console.error('Error al actualizar curso:', error);
+                    return null;
+                }
             },
 
-            getCourseById: (id) => {
-                const { courses } = get()
-                return courses.find(course => course.id === id)
+            // ==========================================
+            // 🗑️ ELIMINAR CURSO
+            // ==========================================
+            eliminarCurso: async (cid: string): Promise<boolean> => {
+                set({ isLoading: true, error: null });
+
+                console.log(cid)
+
+                try {
+
+                    const token = cookieUtils.get('matuc_token') || '';
+
+                    console.log(token)
+
+                    const response = await fetch(`${API_BASE_URL}/api/curso/${cid}`, {
+                        method: 'DELETE',
+                        headers: { 'x-token': token },
+                    });
+
+                    console.log(response)
+
+                    await handleApiResponse<{
+                        ok: boolean;
+                        message: string;
+                    }>(response);
+
+                    set((state) => ({
+                        // Remover de la lista
+                        cursos: state.cursos.filter(curso => curso.cid !== cid),
+                        // Limpiar curso actual si coincide
+                        cursoActual: state.cursoActual?.cid === cid ? null : state.cursoActual,
+                        isLoading: false
+                    }));
+
+                    return true;
+
+                } catch (error) {
+                    set({
+                        error: error instanceof Error ? error.message : 'Error al eliminar curso',
+                        isLoading: false
+                    });
+                    console.error('Error al eliminar curso:', error);
+                    return false;
+                }
             },
 
-            getSectionsByCourse: (courseId) => {
-                const { sections } = get()
-                return sections
-                    .filter(section => section.courseId === courseId)
-                    .sort((a, b) => a.order - b.order)
+            // ==========================================
+            // 🔧 MÉTODOS DE ESTADO
+            // ==========================================
+
+            // Actualizar filtros (sin hacer petición)
+            setFiltros: (nuevosFiltros: Partial<CursoFiltros>) => {
+                set((state) => ({
+                    filtros: { ...state.filtros, ...nuevosFiltros }
+                }));
             },
 
-            getExercisesBySection: (sectionId) => {
-                const { exercises } = get()
-                return exercises
-                    .filter(exercise => exercise.sectionId === sectionId)
-                    .sort((a, b) => a.order - b.order)
+            // Limpiar error
+            clearError: () => {
+                set({ error: null });
             },
 
-            getPublishedSections: (courseId) => {
-                const { sections } = get()
-                return sections
-                    .filter(section => section.courseId === courseId && section.isPublished)
-                    .sort((a, b) => a.order - b.order)
+            // Limpiar curso actual
+            clearCursoActual: () => {
+                set({ cursoActual: null });
             },
 
-            getTotalExercises: (courseId) => {
-                const { sections, exercises } = get()
-                const courseSections = sections.filter(s => s.courseId === courseId)
-                const sectionIds = courseSections.map(s => s.id)
-                return exercises.filter(e => sectionIds.includes(e.sectionId)).length
-            }
+            // Establecer loading manualmente
+            setLoading: (loading: boolean) => {
+                set({ isLoading: loading });
+            },
+
+            // Establecer error manualmente
+            setError: (error: string | null) => {
+                set({ error });
+            },
         }),
         {
-            name: 'course-store',
-            enabled: process.env.NODE_ENV === 'development'
+            name: 'course-store', // Para DevTools
         }
     )
-)
+);
 
-// Selectores optimizados
-export const useCourses = () => useCourseStore(state => state.courses)
-export const useCurrentCourse = () => useCourseStore(state => state.currentCourse)
-export const useSections = () => useCourseStore(state => state.sections)
-export const useExercises = () => useCourseStore(state => state.exercises)
-export const useCourseLoading = () => useCourseStore(state => state.isLoading)
-export const useCourseError = () => useCourseStore(state => state.error)
-export const useCourseFilters = () => useCourseStore(state => state.filters)
+// ==========================================
+// 🎯 SELECTORES ÚTILES (COMPUTED VALUES)
+// ==========================================
 
-// Hook completo de cursos
-export const useCourse = () => {
-    const store = useCourseStore()
+// Selectores para componentes que necesiten datos específicos
+export const useCursos = () => useCourseStore((state) => state.cursos);
+export const useCursoActual = () => useCourseStore((state) => state.cursoActual);
+export const useIsLoading = () => useCourseStore((state) => state.isLoading);
+export const useError = () => useCourseStore((state) => state.error);
+export const usePagination = () => useCourseStore((state) => state.pagination);
+export const useFiltros = () => useCourseStore((state) => state.filtros);
+
+// Selectores computados más complejos
+export const useCursosActivos = () =>
+    useCourseStore((state: CursoStore) => state.cursos.filter((curso: Curso) => curso.activo));
+
+export const useCursosPublicos = () =>
+    useCourseStore((state: CursoStore) => state.cursos.filter((curso: Curso) => curso.publico));
+
+export const useCursosPorCategoria = (categoria: string) =>
+    useCourseStore((state: CursoStore) => state.cursos.filter((curso: Curso) => curso.categoria === categoria));
+
+export const useEstadisticasCursos = () =>
+    useCourseStore((state: CursoStore) => {
+        const cursos = state.cursos;
+        return {
+            total: cursos.length,
+            activos: cursos.filter((c: Curso) => c.activo).length,
+            publicos: cursos.filter((c: Curso) => c.publico).length,
+            totalEstudiantes: cursos.reduce((sum: number, c: Curso) => sum + c.estadisticas.totalEstudiantes, 0),
+            promedioCreditos: cursos.length > 0
+                ? cursos.reduce((sum: number, c: Curso) => sum + c.creditos, 0) / cursos.length
+                : 0,
+        };
+    });
+
+// ==========================================
+// 🛠️ HOOKS COMPUESTOS PARA CASOS COMUNES
+// ==========================================
+
+// Hook para manejar la carga inicial de cursos
+export function useCursosIniciales(filtros?: CursosQuery) {
+    const { obtenerCursos, cursos, isLoading, error } = useCourseStore();
+
+    React.useEffect(() => {
+        if (cursos.length === 0) {
+            obtenerCursos(filtros);
+        }
+    }, [obtenerCursos, cursos.length, filtros]);
+
+    return { cursos, isLoading, error, refetch: () => obtenerCursos(filtros) };
+}
+
+// Hook para manejar un curso específico
+export function useCurso(cid: string) {
+    const { obtenerCurso, cursoActual, isLoading, error, clearCursoActual } = useCourseStore();
+
+    React.useEffect(() => {
+        if (cid) {
+            obtenerCurso(cid);
+        }
+
+        return () => clearCursoActual();
+    }, [cid, obtenerCurso, clearCursoActual]);
+
+    return { curso: cursoActual, isLoading, error };
+}
+
+// Hook para operaciones CRUD con feedback
+export function useCursoOperaciones() {
+    const { crearCurso, actualizarCurso, eliminarCurso, isLoading, error, clearError } = useCourseStore();
 
     return {
-        // Estado
-        courses: store.courses,
-        currentCourse: store.currentCourse,
-        sections: store.sections,
-        exercises: store.exercises,
-        isLoading: store.isLoading,
-        error: store.error,
-        stats: store.stats,
-        filters: store.filters,
-
-        // Acciones
-        setCourses: store.setCourses,
-        addCourse: store.addCourse,
-        updateCourse: store.updateCourse,
-        removeCourse: store.removeCourse,
-        setCurrentCourse: store.setCurrentCourse,
-
-        // Selectores
-        filteredCourses: store.getFilteredCourses(),
-        getCourseById: store.getCourseById,
-        getSectionsByCourse: store.getSectionsByCourse,
-        getExercisesBySection: store.getExercisesBySection,
-
-        // Utilidades
-        setLoading: store.setLoading,
-        setError: store.setError,
-        clearFilters: store.clearFilters
-    }
+        crear: crearCurso,
+        actualizar: actualizarCurso,
+        eliminar: eliminarCurso,
+        isLoading,
+        error,
+        clearError,
+    };
 }
