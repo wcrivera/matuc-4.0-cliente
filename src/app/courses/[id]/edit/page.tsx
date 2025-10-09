@@ -273,7 +273,7 @@ export default function EditCoursePage() {
                         <div className="bg-gray-50 p-4 rounded-lg">
                             <p className="text-gray-500 mb-1">Total de Módulos</p>
                             <p className="text-gray-900 font-semibold text-lg">
-                                {cursoActual.estadisticas.totalModulos}
+                                {cursoActual.estadisticas.totalCapitulos}
                             </p>
                         </div>
                     </div>

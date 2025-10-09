@@ -52,7 +52,7 @@ export interface Curso {
     estadisticas: {
         totalEstudiantes: number;
         totalProfesores: number;
-        totalModulos: number;
+        totalCapitulos: number;
         ultimaActividad: string;      // ISO string
     };
 }

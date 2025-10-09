@@ -10,7 +10,6 @@ import type {
     ActualizarCursoRequest,
     CursoPaginacion
 } from '@/types/course.types';
-import { string } from 'zod';
 
 // ==========================================
 // 🌐 API CLIENT FUNCTIONS
@@ -140,13 +139,9 @@ export const useCourseStore = create<CursoStore>()(
             // ==========================================
             obtenerCurso: async (cid: string) => {
 
-                // console.log(cid)
-                
                 set({ isLoading: true, error: null });
 
                 try {
-
-
                     const token = cookieUtils.get('matuc_token') || '';
 
                     const response = await fetch(`${API_BASE_URL}/api/curso/${cid}`, {
@@ -185,8 +180,6 @@ export const useCourseStore = create<CursoStore>()(
                         headers: getAuthHeaders(),
                         body: JSON.stringify(datos),
                     });
-
-                    console.log(response)
 
                     const result = await handleApiResponse<{
                         ok: boolean;

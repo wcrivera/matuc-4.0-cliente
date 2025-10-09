@@ -17,9 +17,7 @@ import {
     Loader2,
     AlertCircle,
     Sparkles,
-    ArrowLeft,
-    Plus
-
+    ArrowLeft
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';

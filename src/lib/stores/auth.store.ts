@@ -167,7 +167,6 @@ export const useAuthStore = create<AuthStore>()(
 
             // Acción: Login con Outlook/Microsoft
             loginOutlook: async (token: string) => {
-                console.log(token)
                 set({ isLoading: true, error: null })
 
                 try {
@@ -259,10 +258,9 @@ export const useAuthStore = create<AuthStore>()(
                     }
 
                     // Verificar token con backend
-                    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                        },
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/refresh`, {
+                        method: 'GET',
+                        headers: { 'x-token': token },
                     })
 
                     if (response.ok) {

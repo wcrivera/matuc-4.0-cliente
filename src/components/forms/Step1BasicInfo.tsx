@@ -1,18 +1,16 @@
 // src/components/forms/CourseForm.tsx
 'use client';
-import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
+import { motion } from 'framer-motion';
 import {
     BookOpen,
     Tag,
     Hash,
     FileText,
-    Image as ImageIcon,
     AlertCircle,
     Info,
 } from 'lucide-react';
 import { Input } from '@/components/ui/Input';
-import { Curso, CursoCategoria } from '@/types/course.types';
+import { CursoCategoria } from '@/types/course.types';
 import { CourseFormData } from './CourseForm';
 import { UseFormRegister, FieldErrors } from 'react-hook-form';
 

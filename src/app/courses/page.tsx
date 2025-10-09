@@ -1,20 +1,22 @@
+// *************************
+// MODELO UNO
+// *************************
+
+// src/app/courses/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { Plus, Search, Sparkles, BookOpen } from 'lucide-react';
 import { useCourseStore } from '@/lib/stores/course.store';
 import type { CursosQuery, Curso } from '@/types/course.types';
-import CursoCard from '../../components/ui/CursoCard';
+import { CursoCard } from '@/components/ui/CursoCard';
 import { Pagination } from '@/components/ui/Pagination';
 import { Filtros } from '@/components/ui/Filtros';
 
-// ==========================================
-// 🎨 COMPONENTE PRINCIPAL DE CURSOS
-// ==========================================
-
 export default function CoursesPage() {
     // === ESTADO DEL STORE ===
-
     const cursos = useCourseStore(state => state.cursos);
     const isLoading = useCourseStore(state => state.isLoading);
     const error = useCourseStore(state => state.error);
@@ -23,34 +25,28 @@ export default function CoursesPage() {
 
     // === ACCIONES DEL STORE ===
     const obtenerCursos = useCourseStore(state => state.obtenerCursos);
-    const setFiltros = useCourseStore(state => state.setFiltros);
+    // const setFiltros = useCourseStore(state => state.setFiltros);
     const clearError = useCourseStore(state => state.clearError);
     const eliminarCurso = useCourseStore(state => state.eliminarCurso);
 
-    // === ESTADO LOCAL PARA FILTROS ===
-    const [cursosLocal, setCursosLocal] = useState([] as Curso[]);
+    // === ESTADO LOCAL ===
+    const [cursosLocal, setCursosLocal] = useState<Curso[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(filtros.categoria || '');
     const [soloActivos, setSoloActivos] = useState(filtros.activo ?? true);
     const [soloPublicos, setSoloPublicos] = useState(filtros.publico ?? false);
     const [paginaActual, setPaginaActual] = useState(1);
 
-
-    // ==========================================
-    // 🔄 EFECTOS Y CARGA INICIAL
-    // ==========================================
-
-    // Cargar cursos al montar el componente
+    // === EFECTOS ===
     useEffect(() => {
         const query: CursosQuery = {
             page: 1,
             limit: 12,
             search: '',
-            categoria: '',
+            categoria: undefined,
             activo: true,
             publico: true,
         };
-
         obtenerCursos(query);
     }, [obtenerCursos]);
 
@@ -65,237 +61,270 @@ export default function CoursesPage() {
         setCursosLocal(cursosCategoria);
     }, [categoriaSeleccionada, cursos]);
 
-    useEffect(() => {
-        const cursosActivos = cursos.filter(curso =>
-            soloActivos ? curso.activo === true : true
-        );
-        setCursosLocal(cursosActivos);
-    }, [soloActivos, cursos]);
-
-    useEffect(() => {
-        const cursosPublicos = cursos.filter(curso =>
-            soloPublicos ? curso.publico === true : true
-        );
-        setCursosLocal(cursosPublicos);
-    }, [soloPublicos, cursos]);
-
-    useEffect(() => {
-        const cursosSearchTerm = cursos.filter(curso =>
-            curso.nombre.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        setCursosLocal(cursosSearchTerm);
-    }, [searchTerm, cursos]);
-
-
-
-
-
-
-    // useEffect(() => {
-    //     const query: CursosQuery = {
-    //         page: paginaActual,
-    //         limit: 12,
-    //         search: searchTerm || '',
-    //         categoria: categoriaSeleccionada,
-    //         activo: soloActivos,
-    //         publico: soloPublicos || '',
-    //     };
-
-    //     obtenerCursos(query);
-    // }, [paginaActual, soloActivos, soloPublicos, obtenerCursos]);
-
-    // Aplicar filtros con debounce para búsqueda
-    // useEffect(() => {
-    //     const timeoutId = setTimeout(() => {
-    //         const query: CursosQuery = {
-    //             page: 1, // Resetear a página 1 cuando se filtra
-    //             limit: 12,
-    //             search: searchTerm || undefined,
-    //             categoria: categoriaSeleccionada || '',
-    //             activo: soloActivos,
-    //             publico: soloPublicos || undefined,
-    //         };
-
-    //         setFiltros({
-    //             search: searchTerm || undefined,
-    //             categoria: categoriaSeleccionada || undefined,
-    //             activo: soloActivos,
-    //             publico: soloPublicos || undefined,
-    //         });
-
-    //         obtenerCursos(query);
-    //         setPaginaActual(1);
-    //     }, 500); // Debounce de 500ms
-
-    //     return () => clearTimeout(timeoutId);
-    // }, [searchTerm, categoriaSeleccionada, obtenerCursos, setFiltros, soloActivos, soloPublicos]);
-
-    // ==========================================
-    // 🎯 HANDLERS DE EVENTOS
-    // ==========================================
-
-    const handleEliminarCurso = async (curso: Curso) => {
-        if (!confirm(`¿Estás seguro de eliminar el curso "${curso.nombre}"?`)) {
-            return;
-        }
-
-        const success = await eliminarCurso(curso.cid);
-        if (success) {
-            // Recargar la página actual
-            const query: CursosQuery = {
-                page: paginaActual,
-                limit: 12,
-                search: searchTerm || undefined,
-                categoria: categoriaSeleccionada || undefined,
-                activo: soloActivos,
-                publico: soloPublicos || undefined,
-            };
-            obtenerCursos(query);
-        }
-    };
-
+    // === HANDLERS ===
     const handleLimpiarFiltros = () => {
         setSearchTerm('');
         setCategoriaSeleccionada('');
         setSoloActivos(true);
         setSoloPublicos(false);
-        setPaginaActual(1);
     };
 
-    const handleCambiarPagina = (nuevaPagina: number) => {
-        setPaginaActual(nuevaPagina);
-        // El useEffect se encarga de cargar los datos
+    const handleCambiarPagina = (page: number) => {
+        setPaginaActual(page);
     };
 
-    // ==========================================
-    // 🎨 RENDER PRINCIPAL
-    // ==========================================
+    // const handleEliminarCurso = async (curso: Curso) => {
+    //     await eliminarCurso(curso.cid);
+    // };
 
+    // === ERROR STATE ===
     if (error) {
         return (
-            <div className="min-h-screen bg-gray-50 p-6">
-                <div className="max-w-7xl mx-auto">
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-                        <h2 className="text-lg font-semibold text-red-800 mb-2">Error al cargar cursos</h2>
-                        <p className="text-red-700 mb-4">{error}</p>
-                        <div className="flex gap-4 justify-center">
+            <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center p-6">
+                <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full"
+                >
+                    <div className="text-center">
+                        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span className="text-3xl">⚠️</span>
+                        </div>
+                        <h2 className="text-2xl font-bold text-gray-900 mb-2">Error al cargar</h2>
+                        <p className="text-gray-600 mb-6">{error}</p>
+                        <div className="flex gap-3">
                             <button
                                 onClick={() => {
                                     clearError();
                                     obtenerCursos();
                                 }}
-                                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
                             >
                                 Reintentar
                             </button>
                             <button
                                 onClick={clearError}
-                                className="px-4 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 transition-colors"
+                                className="flex-1 px-4 py-2 border-2 border-red-200 text-red-700 rounded-lg hover:bg-red-50 transition-colors font-medium"
                             >
-                                Cerrar error
+                                Cerrar
                             </button>
                         </div>
                     </div>
-                </div>
+                </motion.div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="max-w-7xl mx-auto p-6">
-                {/* Header */}
-                <div className="flex justify-between items-center mb-8">
-                    <div>
-                        <h1 className="text-3xl font-bold text-gray-900">Cursos</h1>
-                        <p className="text-gray-600 mt-1">
-                            Gestiona todos los cursos de la plataforma
-                        </p>
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-gray-50">
+            <div className="max-w-7xl mx-auto px-6 py-10">
+                
+                {/* === HEADER PREMIUM === */}
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-10"
+                >
+                    <div className="flex items-start justify-between">
+                        {/* Título y descripción */}
+                        <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-3">
+                                <div className="p-3 bg-gradient-to-br from-[#003f7f] to-[#00a0d1] rounded-2xl shadow-lg">
+                                    <BookOpen className="w-8 h-8 text-white" />
+                                </div>
+                                <div>
+                                    <h1 className="text-4xl font-bold text-gray-900 mb-1">
+                                        Mis Cursos
+                                    </h1>
+                                    <p className="text-gray-600 flex items-center gap-2">
+                                        <Sparkles className="w-4 h-4 text-[#ffc72c]" />
+                                        Gestiona y accede a todos tus cursos
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Botón Nuevo Curso */}
+                        <Link href="/courses/create">
+                            <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#ffc72c] to-[#ffb700] text-gray-900 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all"
+                            >
+                                <Plus className="w-5 h-5" />
+                                Nuevo Curso
+                            </motion.button>
+                        </Link>
                     </div>
-                    <Link
-                        href="/courses/create"
-                        className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+
+                    {/* Stats rápidos */}
+                    <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 }}
+                        className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4"
                     >
-                        + Nuevo Curso
-                    </Link>
-                </div>
+                        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-gray-100 shadow-sm">
+                            <p className="text-sm text-gray-500 font-medium mb-1">Total Cursos</p>
+                            <p className="text-2xl font-bold text-[#003f7f]">
+                                {pagination?.totalItems || cursos.length}
+                            </p>
+                        </div>
+                        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-gray-100 shadow-sm">
+                            <p className="text-sm text-gray-500 font-medium mb-1">Activos</p>
+                            <p className="text-2xl font-bold text-green-600">
+                                {cursos.filter(c => c.activo).length}
+                            </p>
+                        </div>
+                        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-gray-100 shadow-sm">
+                            <p className="text-sm text-gray-500 font-medium mb-1">Públicos</p>
+                            <p className="text-2xl font-bold text-[#00a0d1]">
+                                {cursos.filter(c => c.publico).length}
+                            </p>
+                        </div>
+                        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-gray-100 shadow-sm">
+                            <p className="text-sm text-gray-500 font-medium mb-1">Categorías</p>
+                            <p className="text-2xl font-bold text-[#ffc72c]">
+                                {new Set(cursos.map(c => c.categoria)).size}
+                            </p>
+                        </div>
+                    </motion.div>
+                </motion.div>
 
-                {/* Filtros */}
-                <Filtros
-                    searchTerm={searchTerm}
-                    setSearchTerm={setSearchTerm}
-                    categoriaSeleccionada={categoriaSeleccionada}
-                    setCategoriaSeleccionada={setCategoriaSeleccionada}
-                    soloActivos={soloActivos}
-                    setSoloActivos={setSoloActivos}
-                    soloPublicos={soloPublicos}
-                    setSoloPublicos={setSoloPublicos}
-                    handleLimpiarFiltros={handleLimpiarFiltros}
-                />
+                {/* === FILTROS === */}
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="mb-8"
+                >
+                    <Filtros
+                        searchTerm={searchTerm}
+                        setSearchTerm={setSearchTerm}
+                        categoriaSeleccionada={categoriaSeleccionada}
+                        setCategoriaSeleccionada={setCategoriaSeleccionada}
+                        soloActivos={soloActivos}
+                        setSoloActivos={setSoloActivos}
+                        soloPublicos={soloPublicos}
+                        setSoloPublicos={setSoloPublicos}
+                        handleLimpiarFiltros={handleLimpiarFiltros}
+                    />
+                </motion.div>
 
-                {/* Loading State */}
+                {/* === LOADING STATE === */}
                 {isLoading && (
-                    <div className="mt-8">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {[...Array(8)].map((_, i) => (
-                                <div key={i} className="bg-white rounded-lg shadow-sm border p-6 animate-pulse">
-                                    <div className="h-4 bg-gray-200 rounded mb-4"></div>
-                                    <div className="h-3 bg-gray-200 rounded mb-2"></div>
-                                    <div className="h-3 bg-gray-200 rounded mb-4"></div>
-                                    <div className="grid grid-cols-2 gap-4 mb-4">
-                                        <div className="h-3 bg-gray-200 rounded"></div>
-                                        <div className="h-3 bg-gray-200 rounded"></div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {[...Array(6)].map((_, i) => (
+                            <motion.div
+                                key={i}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: i * 0.05 }}
+                                className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
+                            >
+                                <div className="h-40 bg-gradient-to-br from-gray-200 to-gray-300 animate-pulse" />
+                                <div className="p-6 space-y-4">
+                                    <div className="h-6 bg-gray-200 rounded-lg animate-pulse" />
+                                    <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4" />
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="h-16 bg-gray-100 rounded-xl animate-pulse" />
+                                        <div className="h-16 bg-gray-100 rounded-xl animate-pulse" />
                                     </div>
                                 </div>
-                            ))}
-                        </div>
+                            </motion.div>
+                        ))}
                     </div>
                 )}
 
-                {/* Resultados */}
-                {!isLoading && (
-                    <>
-                        {/* Stats */}
-                        <div className="mt-6 mb-4">
-                            <p className="text-sm text-gray-600">
-                                {pagination ? `${pagination.totalItems} cursos encontrados` : `${cursos.length} cursos`}
+                {/* === GRID DE CURSOS === */}
+                {!isLoading && cursosLocal.length > 0 && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.3 }}
+                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10"
+                    >
+                        {cursosLocal.map((curso, index) => (
+                            <motion.div
+                                key={curso.cid}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: index * 0.05 }}
+                            >
+                                <CursoCard 
+                                    curso={curso}
+                                    onDelete={(id) => eliminarCurso(id)}
+                                />
+                            </motion.div>
+                        ))}
+                    </motion.div>
+                )}
+
+                {/* === EMPTY STATE === */}
+                {!isLoading && cursosLocal.length === 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="text-center py-20"
+                    >
+                        <div className="max-w-md mx-auto">
+                            <div className="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <Search className="w-10 h-10 text-gray-400" />
+                            </div>
+                            <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                                No se encontraron cursos
+                            </h3>
+                            <p className="text-gray-600 mb-6">
+                                {searchTerm || categoriaSeleccionada
+                                    ? 'Intenta ajustar los filtros de búsqueda'
+                                    : 'Comienza creando tu primer curso'}
                             </p>
-                        </div>
-
-                        {/* Grid de cursos */}
-                        {cursosLocal.length > 0 ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                {cursosLocal.map(curso => (
-                                    <CursoCard key={curso.cid} curso={curso} handleEliminarCurso={handleEliminarCurso} />
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="text-center py-12">
-                                <div className="text-gray-400 text-6xl mb-4">📚</div>
-                                <h3 className="text-lg font-semibold text-gray-900 mb-2">No se encontraron cursos</h3>
-                                <p className="text-gray-600 mb-4">
-                                    {searchTerm || categoriaSeleccionada
-                                        ? 'Intenta ajustar los filtros de búsqueda'
-                                        : 'Comienza creando tu primer curso'
-                                    }
-                                </p>
-                                <Link
-                                    href="/courses/create"
-                                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                                >
+                            <Link href="/courses/create">
+                                <button className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#003f7f] to-[#00a0d1] text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all">
+                                    <Plus className="w-5 h-5" />
                                     Crear primer curso
-                                </Link>
-                            </div>
-                        )}
+                                </button>
+                            </Link>
+                        </div>
+                    </motion.div>
+                )}
 
-                        {/* Paginación */}
-                        <Pagination pagination={pagination} paginaActual={paginaActual} handleCambiarPagina={handleCambiarPagina} />
-                    </>
+                {/* === PAGINACIÓN === */}
+                {!isLoading && cursosLocal.length > 0 && pagination && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.4 }}
+                    >
+                        <Pagination 
+                            pagination={{
+                                ...pagination,
+                                currentPage: paginaActual
+                            }} 
+                            paginaActual={paginaActual} 
+                            handleCambiarPagina={handleCambiarPagina} 
+                        />
+                    </motion.div>
                 )}
             </div>
         </div>
     );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+// // *************************
+// // MODELO DOS
+// // *************************
 
 // // src/app/courses/page.tsx - Página Principal de Cursos Espectacular
 // 'use client'
