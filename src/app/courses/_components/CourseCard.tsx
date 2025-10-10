@@ -1,164 +1,123 @@
-// src/app/courses/_components/CourseCard.tsx
-// ==========================================
-// 🃏 CARD DE CURSO INDIVIDUAL
-// ==========================================
-
+// src/components/courses/CourseCard.tsx
 'use client'
 
-import React from 'react'
-import Link from 'next/link'
-import { motion } from 'framer-motion'
-import {
-    BookOpen,
-    Users,
-    Calendar,
-    Award,
-    BookMarked,
-    ChevronRight,
-    Settings,
-    UserPlus,
-} from 'lucide-react'
-import { PermissionGate } from '@/components/auth/PermissionGate'
-import { RoleBadge } from '@/components/courses/RoleBadge'
-import { getCategoryConfig } from '@/components/courses/CategoryConfig'
-import type { MiCurso } from '@/lib/hooks/useMatricula'
-
-// ==========================================
-// 🎯 PROPS
-// ==========================================
+import { CursoConMatricula } from '@/types/matricula.types';
+import { Users, Calendar, Clock } from 'lucide-react';
+import Link from 'next/link';
 
 interface CourseCardProps {
-    miCurso: MiCurso
+    data: CursoConMatricula;
 }
 
-// ==========================================
-// 🎨 COMPONENTE
-// ==========================================
+export function CourseCard({ data }: CourseCardProps) {
+    const { curso, matricula, grupo } = data;
 
-export function CourseCard({ miCurso }: CourseCardProps) {
-    const categoryConfig = getCategoryConfig(miCurso.curso.categoria)
-    const Icon = categoryConfig.icon
+    // Determinar color según rol
+    const getRolColor = () => {
+        switch (matricula.rol) {
+            case 'estudiante': return 'from-blue-500 to-cyan-500';
+            case 'ayudante': return 'from-yellow-500 to-orange-500';
+            case 'profesor': return 'from-purple-500 to-pink-500';
+            case 'profesor_editor': return 'from-green-500 to-emerald-500';
+            default: return 'from-gray-500 to-gray-600';
+        }
+    };
+
+    const getRolLabel = () => {
+        switch (matricula.rol) {
+            case 'estudiante': return '👨‍🎓 Estudiante';
+            case 'ayudante': return '🤝 Ayudante';
+            case 'profesor': return '👨‍🏫 Profesor';
+            case 'profesor_editor': return '✏️ Profesor Editor';
+            default: return matricula.rol;
+        }
+    };
+
+    const getRolIcon = () => {
+        switch (matricula.rol) {
+            case 'estudiante': return '👨‍🎓';
+            case 'ayudante': return '🤝';
+            case 'profesor': return '👨‍🏫';
+            case 'profesor_editor': return '✏️';
+            default: return '📚';
+        }
+    };
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            whileHover={{ y: -4, transition: { duration: 0.2 } }}
-            className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100"
-        >
-            {/* Header con gradiente */}
-            <div className={`relative h-32 bg-gradient-to-br ${categoryConfig.color} p-6`}>
-                <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors" />
-
-                <div className="relative z-10 flex items-start justify-between h-full">
-                    <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                            <Icon className="w-6 h-6 text-white" />
-                            <span className="text-white/90 text-sm font-semibold">
-                                {miCurso.curso.sigla}
-                            </span>
-                        </div>
-                        <h3 className="text-white font-bold text-xl line-clamp-2 leading-tight">
-                            {miCurso.curso.nombre}
-                        </h3>
-                    </div>
-
-                    <div className="flex flex-col gap-2 items-end">
-                        <RoleBadge rol={miCurso.matricula.rol} />
-
-                        {miCurso.curso.activo ? (
-                            <div className="bg-green-400/90 text-green-900 text-xs font-medium px-2 py-1 rounded-full">
-                                Activo
+        <Link href={`/courses/${curso.cid}`}>
+            <div className="group bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-gray-200">
+                {/* Header con gradiente */}
+                <div className={`bg-gradient-to-r ${getRolColor()} p-4 text-white relative overflow-hidden`}>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16" />
+                    <div className="relative z-10">
+                        <div className="flex items-start justify-between mb-2">
+                            <div className="flex-1">
+                                <h3 className="text-lg font-bold mb-1 line-clamp-1">
+                                    {curso.nombre}
+                                </h3>
+                                <p className="text-sm text-white/90 font-medium">
+                                    {curso.sigla}
+                                </p>
                             </div>
-                        ) : (
-                            <div className="bg-gray-300/90 text-gray-700 text-xs font-medium px-2 py-1 rounded-full">
-                                Inactivo
+                            <span className="text-3xl">{getRolIcon()}</span>
+                        </div>
+
+                        {/* Badge de rol */}
+                        <div className="inline-flex items-center gap-1 bg-white/20 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium">
+                            {getRolLabel()}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Contenido */}
+                <div className="p-4 space-y-3">
+                    {/* Descripción */}
+                    <p className="text-sm text-gray-600 line-clamp-2 min-h-[2.5rem]">
+                        {curso.descripcion}
+                    </p>
+
+                    {/* Info del curso */}
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                            <Calendar className="w-4 h-4" />
+                            <span>{curso.semestre} - {curso.año}</span>
+                        </div>
+
+                        {grupo && (
+                            <div className="flex items-center gap-2 text-sm text-gray-500">
+                                <Users className="w-4 h-4" />
+                                <span>Grupo {grupo.numero} - {grupo.nombre}</span>
                             </div>
                         )}
+
+                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                            <Clock className="w-4 h-4" />
+                            <span>
+                                Matriculado: {new Date(matricula.fechaMatricula).toLocaleDateString()}
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Estado */}
+                    <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${curso.activo
+                                ? 'bg-green-100 text-green-700'
+                                : 'bg-gray-100 text-gray-700'
+                            }`}>
+                            <span className={`w-2 h-2 rounded-full ${curso.activo ? 'bg-green-500' : 'bg-gray-500'
+                                }`} />
+                            {curso.activo ? 'Activo' : 'Inactivo'}
+                        </span>
+
+                        <span className="text-xs text-gray-400">
+                            {curso.categoria}
+                        </span>
                     </div>
                 </div>
+
+                {/* Hover effect */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
             </div>
-
-            {/* Contenido */}
-            <div className="p-6 space-y-4">
-                {/* Descripción */}
-                <p className="text-gray-600 text-sm leading-relaxed line-clamp-2">
-                    {miCurso.curso.descripcion || 'Sin descripción disponible'}
-                </p>
-
-                {/* Métricas */}
-                <div className="grid grid-cols-2 gap-4 pt-2">
-                    <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Users className="w-4 h-4" />
-                            <span>{miCurso.curso.estadisticas?.totalEstudiantes || 0} estudiantes</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Calendar className="w-4 h-4" />
-                            <span>{miCurso.curso.semestre}</span>
-                        </div>
-                    </div>
-
-                    <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Award className="w-4 h-4" />
-                            <span>{miCurso.curso.creditos} créditos</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <BookMarked className="w-4 h-4" />
-                            <span>{miCurso.curso.estadisticas?.totalCapitulos || 0} módulos</span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Acciones según rol */}
-                <div className="pt-4 flex items-center gap-2 border-t border-gray-100">
-                    {/* Botón de acceso (todos) */}
-                    <Link
-                        href={`/courses/${miCurso.curso.cid}`}
-                        className="flex-1"
-                    >
-                        <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className={`w-full px-4 py-2.5 bg-gradient-to-br ${categoryConfig.color} text-white rounded-xl font-semibold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2`}
-                        >
-                            <BookOpen className="w-4 h-4" />
-                            <span>Ver Curso</span>
-                            <ChevronRight className="w-4 h-4" />
-                        </motion.button>
-                    </Link>
-
-                    {/* Botón de gestión (solo profesores/admin) */}
-                    <PermissionGate permission="canManageEnrollments">
-                        <Link href={`/courses/${miCurso.curso.cid}/students`}>
-                            <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                className="p-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors"
-                                title="Gestionar estudiantes"
-                            >
-                                <UserPlus className="w-4 h-4" />
-                            </motion.button>
-                        </Link>
-                    </PermissionGate>
-
-                    {/* Botón de edición (solo editores/admin) */}
-                    <PermissionGate permission="canEditCourse">
-                        <Link href={`/courses/${miCurso.curso.cid}/edit`}>
-                            <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                className="p-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors"
-                                title="Editar curso"
-                            >
-                                <Settings className="w-4 h-4" />
-                            </motion.button>
-                        </Link>
-                    </PermissionGate>
-                </div>
-            </div>
-        </motion.div>
-    )
+        </Link>
+    );
 }
