@@ -181,6 +181,8 @@ export const useCourseStore = create<CursoStore>()(
                         body: JSON.stringify(datos),
                     });
 
+                    console.log(response)
+
                     const result = await handleApiResponse<{
                         ok: boolean;
                         curso: Curso;

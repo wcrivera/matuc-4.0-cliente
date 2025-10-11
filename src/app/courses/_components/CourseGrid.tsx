@@ -1,49 +1,76 @@
 // src/app/courses/_components/CourseGrid.tsx
-// ==========================================
-// 📊 GRID DE CURSOS CON ESTADOS
-// ==========================================
-
 'use client'
 
 import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { BookOpen } from 'lucide-react'
 import { CourseCard } from './CourseCard'
-import type { MiCurso } from '@/lib/hooks/useMatricula'
+import { CourseEmptyState } from './CourseEmptyState'
+import type { CursoConMatricula } from '@/types/matricula.types'
 
 // ==========================================
-// 🎯 PROPS
+// 🎯 TIPOS
 // ==========================================
 
 interface CourseGridProps {
-    cursos: MiCurso[]
+    cursos: CursoConMatricula[]
     isLoading: boolean
-    error: Error | null
-    searchTerm: string
-    selectedCategory: string
+    error?: Error | null
+    searchTerm?: string
+    filtroActivo?: string
+    onClearFilters?: () => void
 }
 
 // ==========================================
-// 🎨 COMPONENTE
+// 🎨 COMPONENTE DE SKELETON LOADING
+// ==========================================
+
+function CourseCardSkeleton() {
+    return (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden animate-pulse">
+            {/* Header skeleton con gradiente UC */}
+            <div className="h-24 bg-gradient-to-r from-uc-azul/20 to-uc-celeste/20" />
+
+            {/* Content skeleton */}
+            <div className="p-4 space-y-3">
+                <div className="h-4 bg-gray-200 rounded w-3/4" />
+                <div className="h-4 bg-gray-200 rounded w-1/2" />
+
+                <div className="space-y-2 pt-2">
+                    <div className="h-3 bg-gray-100 rounded w-full" />
+                    <div className="h-3 bg-gray-100 rounded w-2/3" />
+                </div>
+
+                <div className="flex justify-between pt-2">
+                    <div className="h-6 bg-gray-100 rounded w-16" />
+                    <div className="h-6 bg-gray-100 rounded w-20" />
+                </div>
+            </div>
+        </div>
+    )
+}
+
+// ==========================================
+// 🎨 COMPONENTE PRINCIPAL
 // ==========================================
 
 export function CourseGrid({
     cursos,
     isLoading,
     error,
-    searchTerm,
-    selectedCategory
+    searchTerm = '',
+    filtroActivo = 'todos',
+    onClearFilters
 }: CourseGridProps) {
+
     // ==========================================
     // 🔄 ESTADO: CARGANDO
     // ==========================================
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center py-20">
-                <div className="text-center">
-                    <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                    <p className="text-gray-600 font-medium">Cargando cursos...</p>
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[...Array(6)].map((_, index) => (
+                    <CourseCardSkeleton key={index} />
+                ))}
             </div>
         )
     }
@@ -53,11 +80,25 @@ export function CourseGrid({
     // ==========================================
     if (error) {
         return (
-            <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-                <p className="text-red-600 font-medium">
-                    Error al cargar los cursos. Por favor, intenta de nuevo.
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-red-50 border-2 border-red-200 rounded-xl p-8 text-center"
+            >
+                <div className="text-6xl mb-4">❌</div>
+                <h3 className="text-xl font-semibold text-red-900 mb-2">
+                    Error al cargar los cursos
+                </h3>
+                <p className="text-red-600 mb-4">
+                    {error.message || 'Ocurrió un error inesperado'}
                 </p>
-            </div>
+                <button
+                    onClick={() => window.location.reload()}
+                    className="px-4 py-2 bg-uc-azul hover:bg-uc-azul-700 text-white rounded-lg transition-colors shadow-uc"
+                >
+                    Reintentar
+                </button>
+            </motion.div>
         )
     }
 
@@ -66,21 +107,12 @@ export function CourseGrid({
     // ==========================================
     if (cursos.length === 0) {
         return (
-            <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="text-center py-20"
-            >
-                <BookOpen className="w-20 h-20 text-gray-300 mx-auto mb-6" />
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                    No se encontraron cursos
-                </h3>
-                <p className="text-gray-600 mb-6">
-                    {searchTerm || selectedCategory !== 'todas'
-                        ? 'Intenta ajustar los filtros de búsqueda'
-                        : 'Aún no estás matriculado en ningún curso'}
-                </p>
-            </motion.div>
+            <CourseEmptyState
+                hasSearch={!!searchTerm}
+                searchTerm={searchTerm}
+                filtroActivo={filtroActivo}
+                onClearFilters={onClearFilters}
+            />
         )
     }
 
@@ -93,11 +125,20 @@ export function CourseGrid({
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
             <AnimatePresence mode="popLayout">
-                {cursos.map((miCurso) => (
-                    <CourseCard
-                        key={miCurso.curso.cid}
-                        miCurso={miCurso}
-                    />
+                {cursos.map((cursoData, index) => (
+                    <motion.div
+                        key={cursoData.matricula.mid}
+                        layout
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        transition={{
+                            duration: 0.3,
+                            delay: index * 0.05, // Efecto escalonado
+                        }}
+                    >
+                        <CourseCard data={cursoData} />
+                    </motion.div>
                 ))}
             </AnimatePresence>
         </motion.div>
