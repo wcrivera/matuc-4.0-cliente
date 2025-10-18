@@ -59,6 +59,9 @@ export default function ChapterPage({ params }: ChapterPageProps) {
   const data = MOCK_CAPITULO_COMPLETO_ESTUDIANTE
   const { capitulo, ejerciciosAyudantia, ejerciciosEvaluacion, permisos, progreso } = data
 
+  // NUEVO: Nombre del curso (mock - después vendrá de la API)
+  const courseName = "MAT1610 - Cálculo I"
+
   // ==========================================
   // 🎨 ANIMACIONES
   // ==========================================
@@ -231,14 +234,14 @@ interface TabButtonProps {
 function TabButton({ active, onClick, icon, label, count }: TabButtonProps) {
   return (
     <motion.button
-      whileHover={{ y: -2 }}
+      whileHover={{ y: -1 }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
       className={`
-        relative flex items-center gap-2 px-6 py-3 font-medium transition-all
+        relative flex items-center gap-2 px-5 py-3 font-semibold text-sm transition-all
         ${active
-          ? 'text-uc-azul border-b-2 border-uc-azul'
-          : 'text-gray-600 hover:text-gray-900 border-b-2 border-transparent'
+          ? 'text-uc-azul bg-uc-azul/5'
+          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
         }
       `}
     >
@@ -246,7 +249,7 @@ function TabButton({ active, onClick, icon, label, count }: TabButtonProps) {
       <span>{label}</span>
       <span
         className={`
-        ml-1 px-2 py-0.5 rounded-full text-xs font-semibold
+        px-2 py-0.5 rounded-full text-xs font-bold
         ${active ? 'bg-uc-azul text-white' : 'bg-gray-200 text-gray-700'}
       `}
       >
@@ -255,7 +258,7 @@ function TabButton({ active, onClick, icon, label, count }: TabButtonProps) {
       {active && (
         <motion.div
           layoutId="activeTab"
-          className="absolute bottom-0 left-0 right-0 h-0.5 bg-uc-azul"
+          className="absolute bottom-0 left-0 right-0 h-1 bg-uc-azul rounded-t-lg"
           transition={{ type: 'spring', stiffness: 500, damping: 30 }}
         />
       )}
