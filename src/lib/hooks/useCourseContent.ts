@@ -16,6 +16,40 @@ import type {
     Contenido
 } from '@/types/course-content.types'
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
+
+// ==========================================
+// 🔧 UTILIDADES (mismo patrón que course.store.ts)
+// ==========================================
+
+const cookieUtils = {
+    get: (name: string): string | null => {
+        if (typeof document === 'undefined') return null;
+        const cookies = document.cookie.split(';').reduce((acc, cookie) => {
+            const [key, value] = cookie.trim().split('=');
+            acc[key] = value;
+            return acc;
+        }, {} as Record<string, string>);
+        return cookies[name] || null;
+    }
+};
+
+function getAuthHeaders(): HeadersInit {
+    const token = cookieUtils.get('matuc_token');
+    return {
+        'Content-Type': 'application/json',
+        ...(token && { Authorization: `Bearer ${token}` })
+    };
+}
+
+async function handleApiResponse<T>(response: Response): Promise<T> {
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+    }
+    return response.json();
+}
+
 // ==========================================
 // 🔧 TIPOS DEL HOOK
 // ==========================================
@@ -68,16 +102,14 @@ export function useCourseContent(courseId: string): UseCourseContentReturn {
         queryFn: async () => {
             // TODO: Por ahora retornamos datos mock para visualizar
             // Descomentar cuando el endpoint esté listo:
-            // const response = await fetch(`/api/courses/${courseId}/content`, {
-            //   credentials: 'include'
-            // })
-            // if (!response.ok) {
-            //   throw new Error('Error al cargar el contenido del curso')
-            // }
-            // return response.json()
+            const response = await fetch(`${API_URL}/api/curso/${courseId}/contenido`, {
+                headers: getAuthHeaders()
+            })
 
-            // MOCK DATA temporal para visualización
-            return getMockCourseData(courseId)
+            const data = await response.json()
+
+            return data.curso
+
         },
         enabled: !!courseId,
         staleTime: 5 * 60 * 1000, // 5 minutos

@@ -1,0 +1,370 @@
+<div style="border-radius: 10px; padding: 1em; background-color: #466e96; color: white;">
+<table style="width: 100%;">
+<tbody>
+<tr>
+<td width="100%"><strong>COIL</strong></td>
+</tr>
+<tr>
+<td width="100%">
+<div style="display: flex; gap: 10px; margin-top: 0.5em;"><a class="btn inline_disabled disabled" style="background-color: white;"> Clase </a> <a class="btn inline_disabled" style="background-color: #466e96; color: white;"> Ayudant&iacute;a </a> <a class="btn inline_disabled" style="background-color: #466e96; color: white;"> Autoevaluaci&oacute;n </a></div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div style="margin-top: 3em;">
+<div style="border: solid 1px #D3D3D3; border-radius: 10px; margin-bottom: 1.5em;">
+<div style="display: flex; gap: 10px; padding: 1em;">
+<div><img id="13041851" src="https://cursos.canvas.uc.cl/courses/91056/files/13041851/preview" alt="class_icon.png" width="60px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13041851" data-api-returntype="File" /></div>
+<div>
+<table style="width: 100%;">
+<tbody>
+<tr>
+<td width="100%"><strong style="color: gray;">Clase 1</strong></td>
+</tr>
+<tr>
+<td><span style="color: #466e96; margin-top: 0.5em;">Semana 1 (22-09). Icebreacker - Reconocimiento (10 ptos) \(\ast\) Encuesta de evaluaci&oacute;n - Inicial (4 ptos inicial+final)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div style="padding: 1em; border-top: solid 1px #D3D3D3;">
+<div><span style="color: #466e96;">1.1. Proyecto COIL MECHE: Migraci&oacute;n y Modelaci&oacute;n Matem&aacute;tica</span></div>
+<div style="display: flex; justify-content: space-between; margin-top: 5px;">
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="https://cursos.manthano.cl/curso/clase/tema/68c980a70de42722523c2b04" target="_blank" rel="noopener"> <img id="13041991" src="https://cursos.canvas.uc.cl/courses/91056/files/13041991/preview" alt="diapo_icon.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13041991" data-api-returntype="File" /> </a>
+<div>Diapositiva</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042105" src="https://cursos.canvas.uc.cl/courses/91056/files/13042105/preview" alt="video_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042105" data-api-returntype="File" /> </a>
+<div>Video</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042106" src="https://cursos.canvas.uc.cl/courses/91056/files/13042106/preview" alt="quizz_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042106" data-api-returntype="File" /> </a>
+<div>Ejercicio</div>
+</div>
+</div>
+</div>
+<div style="padding: 1em; border-top: solid 1px #D3D3D3;">
+<div><span style="color: #466e96;">1.2. Objetivo del proyecto</span></div>
+<div style="display: flex; justify-content: space-between; margin-top: 5px;">
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="https://cursos.manthano.cl/curso/clase/tema/68c982680de42722523c2b64" target="_blank" rel="noopener"> <img id="13041991" src="https://cursos.canvas.uc.cl/courses/91056/files/13041991/preview" alt="diapo_icon.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13041991" data-api-returntype="File" /> </a>
+<div>Diapositiva</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042105" src="https://cursos.canvas.uc.cl/courses/91056/files/13042105/preview" alt="video_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042105" data-api-returntype="File" /> </a>
+<div>Video</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042106" src="https://cursos.canvas.uc.cl/courses/91056/files/13042106/preview" alt="quizz_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042106" data-api-returntype="File" /> </a>
+<div>Ejercicio</div>
+</div>
+</div>
+</div>
+<div style="padding: 1em; border-top: solid 1px #D3D3D3;">
+<div><span style="color: #466e96;">1.3. Estructura de las actividades</span></div>
+<div style="display: flex; justify-content: space-between; margin-top: 5px;">
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="https://cursos.manthano.cl/curso/clase/tema/68c983080de42722523c2bd4" target="_blank" rel="noopener"> <img id="13041991" src="https://cursos.canvas.uc.cl/courses/91056/files/13041991/preview" alt="diapo_icon.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13041991" data-api-returntype="File" /> </a>
+<div>Diapositiva</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042105" src="https://cursos.canvas.uc.cl/courses/91056/files/13042105/preview" alt="video_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042105" data-api-returntype="File" /> </a>
+<div>Video</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042106" src="https://cursos.canvas.uc.cl/courses/91056/files/13042106/preview" alt="quizz_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042106" data-api-returntype="File" /> </a>
+<div>Ejercicio</div>
+</div>
+</div>
+</div>
+<div style="padding: 1em; border-top: solid 1px #D3D3D3;">
+<div><span style="color: #466e96;">1.4. <strong>Actividad.</strong> Icebreacker: Reconocimiento</span></div>
+<div style="display: flex; justify-content: space-between; margin-top: 5px;">
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="https://cursos.manthano.cl/curso/clase/tema/68c9852c0de42722523c2c5f" target="_blank" rel="noopener"> <img id="13041991" src="https://cursos.canvas.uc.cl/courses/91056/files/13041991/preview" alt="diapo_icon.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13041991" data-api-returntype="File" /> </a>
+<div>Diapositiva</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042105" src="https://cursos.canvas.uc.cl/courses/91056/files/13042105/preview" alt="video_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042105" data-api-returntype="File" /> </a>
+<div>Video</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042106" src="https://cursos.canvas.uc.cl/courses/91056/files/13042106/preview" alt="quizz_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042106" data-api-returntype="File" /> </a>
+<div>Ejercicio</div>
+</div>
+</div>
+</div>
+<div style="padding: 1em; border-top: solid 1px #D3D3D3;">
+<div><span style="color: #466e96;">1.5. <strong>Actividad.</strong> Encuesta de Evaluaci&oacute;n</span></div>
+<div style="display: flex; justify-content: space-between; margin-top: 5px;">
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="https://cursos.manthano.cl/curso/clase/tema/68d06d910bab5c704c7acc15" target="_blank" rel="noopener"> <img id="13041991" src="https://cursos.canvas.uc.cl/courses/91056/files/13041991/preview" alt="diapo_icon.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13041991" data-api-returntype="File" /> </a>
+<div>Diapositiva</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042105" src="https://cursos.canvas.uc.cl/courses/91056/files/13042105/preview" alt="video_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042105" data-api-returntype="File" /> </a>
+<div>Video</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042106" src="https://cursos.canvas.uc.cl/courses/91056/files/13042106/preview" alt="quizz_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042106" data-api-returntype="File" /> </a>
+<div>Ejercicio</div>
+</div>
+</div>
+</div>
+<div style="padding: 1em; border-top: solid 1px #D3D3D3;">
+<div><span style="color: #466e96;">1.6. <strong>Rubrica de evaluaci&oacute;n</strong></span></div>
+<div style="display: flex; justify-content: space-between; margin-top: 5px;">
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="https://cursos.manthano.cl/curso/clase/tema/68c979c70de42722523c29f7" target="_blank" rel="noopener"> <img id="13041991" src="https://cursos.canvas.uc.cl/courses/91056/files/13041991/preview" alt="diapo_icon.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13041991" data-api-returntype="File" /> </a>
+<div>Diapositiva</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042105" src="https://cursos.canvas.uc.cl/courses/91056/files/13042105/preview" alt="video_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042105" data-api-returntype="File" /> </a>
+<div>Video</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042106" src="https://cursos.canvas.uc.cl/courses/91056/files/13042106/preview" alt="quizz_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042106" data-api-returntype="File" /> </a>
+<div>Ejercicio</div>
+</div>
+</div>
+</div>
+</div>
+<div style="border: solid 1px #D3D3D3; border-radius: 10px; margin-bottom: 1.5em;">
+<div style="display: flex; gap: 10px; padding: 1em;">
+<div><img id="13041851" src="https://cursos.canvas.uc.cl/courses/91056/files/13041851/preview" alt="class_icon.png" width="60px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13041851" data-api-returntype="File" /></div>
+<div>
+<table style="width: 100%;">
+<tbody>
+<tr>
+<td width="100%"><strong style="color: gray;">Clase 2</strong></td>
+</tr>
+<tr>
+<td><span style="color: #466e96; margin-top: 0.5em;">Semana 2 (29-09). Icebreacker - Organizaci&oacute;n (10 ptos)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div style="padding: 1em; border-top: solid 1px #D3D3D3;">
+<div><span style="color: #466e96;">2.1. <strong>Actividad.</strong> Icebreacker: Organizaci&oacute;n</span></div>
+<div style="display: flex; justify-content: space-between; margin-top: 5px;">
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="https://cursos.manthano.cl/curso/clase/tema/68c985790de42722523c2c81" target="_blank" rel="noopener"> <img id="13041991" src="https://cursos.canvas.uc.cl/courses/91056/files/13041991/preview" alt="diapo_icon.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13041991" data-api-returntype="File" /> </a>
+<div>Diapositiva</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042105" src="https://cursos.canvas.uc.cl/courses/91056/files/13042105/preview" alt="video_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042105" data-api-returntype="File" /> </a>
+<div>Video</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042106" src="https://cursos.canvas.uc.cl/courses/91056/files/13042106/preview" alt="quizz_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042106" data-api-returntype="File" /> </a>
+<div>Ejercicio</div>
+</div>
+</div>
+</div>
+<div style="padding: 1em; border-top: solid 1px #D3D3D3;">
+<div><span style="color: #466e96;">2.2. <strong>Rubrica de evaluaci&oacute;n</strong></span></div>
+<div style="display: flex; justify-content: space-between; margin-top: 5px;">
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="https://cursos.manthano.cl/curso/clase/tema/68c97a0e0de42722523c2a0d" target="_blank" rel="noopener"> <img id="13041991" src="https://cursos.canvas.uc.cl/courses/91056/files/13041991/preview" alt="diapo_icon.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13041991" data-api-returntype="File" /> </a>
+<div>Diapositiva</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042105" src="https://cursos.canvas.uc.cl/courses/91056/files/13042105/preview" alt="video_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042105" data-api-returntype="File" /> </a>
+<div>Video</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042106" src="https://cursos.canvas.uc.cl/courses/91056/files/13042106/preview" alt="quizz_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042106" data-api-returntype="File" /> </a>
+<div>Ejercicio</div>
+</div>
+</div>
+</div>
+</div>
+<div style="border: solid 1px #D3D3D3; border-radius: 10px; margin-bottom: 1.5em;">
+<div style="display: flex; gap: 10px; padding: 1em;">
+<div><img id="13041851" src="https://cursos.canvas.uc.cl/courses/91056/files/13041851/preview" alt="class_icon.png" width="60px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13041851" data-api-returntype="File" /></div>
+<div>
+<table style="width: 100%;">
+<tbody>
+<tr>
+<td width="100%"><strong style="color: gray;">Clase 3</strong></td>
+</tr>
+<tr>
+<td><span style="color: #466e96; margin-top: 0.5em;">Semana 3 (13-10). Fase 1 - Modelaci&oacute;n matem&aacute;tica (20 ptos)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div style="padding: 1em; border-top: solid 1px #D3D3D3;">
+<div><span style="color: #466e96;">3.1. <strong>Actividad.</strong> Modelaci&oacute;n matem&aacute;tica</span></div>
+<div style="display: flex; justify-content: space-between; margin-top: 5px;">
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="https://cursos.manthano.cl/curso/clase/tema/68c985d60de42722523c2ca3" target="_blank" rel="noopener"> <img id="13041991" src="https://cursos.canvas.uc.cl/courses/91056/files/13041991/preview" alt="diapo_icon.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13041991" data-api-returntype="File" /> </a>
+<div>Diapositiva</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042105" src="https://cursos.canvas.uc.cl/courses/91056/files/13042105/preview" alt="video_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042105" data-api-returntype="File" /> </a>
+<div>Video</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042106" src="https://cursos.canvas.uc.cl/courses/91056/files/13042106/preview" alt="quizz_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042106" data-api-returntype="File" /> </a>
+<div>Ejercicio</div>
+</div>
+</div>
+</div>
+<div style="padding: 1em; border-top: solid 1px #D3D3D3;">
+<div><span style="color: #466e96;">3.2. <strong>Rubrica de evaluaci&oacute;n</strong></span></div>
+<div style="display: flex; justify-content: space-between; margin-top: 5px;">
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="https://cursos.manthano.cl/curso/clase/tema/68c97a4f0de42722523c2a23" target="_blank" rel="noopener"> <img id="13041991" src="https://cursos.canvas.uc.cl/courses/91056/files/13041991/preview" alt="diapo_icon.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13041991" data-api-returntype="File" /> </a>
+<div>Diapositiva</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042105" src="https://cursos.canvas.uc.cl/courses/91056/files/13042105/preview" alt="video_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042105" data-api-returntype="File" /> </a>
+<div>Video</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042106" src="https://cursos.canvas.uc.cl/courses/91056/files/13042106/preview" alt="quizz_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042106" data-api-returntype="File" /> </a>
+<div>Ejercicio</div>
+</div>
+</div>
+</div>
+</div>
+<div style="border: solid 1px #D3D3D3; border-radius: 10px; margin-bottom: 1.5em;">
+<div style="display: flex; gap: 10px; padding: 1em;">
+<div><img id="13041851" src="https://cursos.canvas.uc.cl/courses/91056/files/13041851/preview" alt="class_icon.png" width="60px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13041851" data-api-returntype="File" /></div>
+<div>
+<table style="width: 100%;">
+<tbody>
+<tr>
+<td width="100%"><strong style="color: gray;">Clase 4</strong></td>
+</tr>
+<tr>
+<td><span style="color: #466e96; margin-top: 0.5em;">Semana 4 (20-10). Fase 2 - An&aacute;lisis cualitativo (20 ptos)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div style="padding: 1em; border-top: solid 1px #D3D3D3;">
+<div><span style="color: #466e96;">4.1. <strong>Actividad.</strong> An&aacute;lisis cualitativo</span></div>
+<div style="display: flex; justify-content: space-between; margin-top: 5px;">
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="https://cursos.manthano.cl/curso/clase/tema/68c9862d0de42722523c2cdd" target="_blank" rel="noopener"> <img id="13041991" src="https://cursos.canvas.uc.cl/courses/91056/files/13041991/preview" alt="diapo_icon.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13041991" data-api-returntype="File" /> </a>
+<div>Diapositiva</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042105" src="https://cursos.canvas.uc.cl/courses/91056/files/13042105/preview" alt="video_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042105" data-api-returntype="File" /> </a>
+<div>Video</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042106" src="https://cursos.canvas.uc.cl/courses/91056/files/13042106/preview" alt="quizz_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042106" data-api-returntype="File" /> </a>
+<div>Ejercicio</div>
+</div>
+</div>
+</div>
+<div style="padding: 1em; border-top: solid 1px #D3D3D3;">
+<div><span style="color: #466e96;">4.2. <strong>Rubrica de evaluaci&oacute;n</strong></span></div>
+<div style="display: flex; justify-content: space-between; margin-top: 5px;">
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="https://cursos.manthano.cl/curso/clase/tema/68c97aa30de42722523c2a52" target="_blank" rel="noopener"> <img id="13041991" src="https://cursos.canvas.uc.cl/courses/91056/files/13041991/preview" alt="diapo_icon.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13041991" data-api-returntype="File" /> </a>
+<div>Diapositiva</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042105" src="https://cursos.canvas.uc.cl/courses/91056/files/13042105/preview" alt="video_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042105" data-api-returntype="File" /> </a>
+<div>Video</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042106" src="https://cursos.canvas.uc.cl/courses/91056/files/13042106/preview" alt="quizz_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042106" data-api-returntype="File" /> </a>
+<div>Ejercicio</div>
+</div>
+</div>
+</div>
+</div>
+<div style="border: solid 1px #D3D3D3; border-radius: 10px; margin-bottom: 1.5em;">
+<div style="display: flex; gap: 10px; padding: 1em;">
+<div><img id="13041851" src="https://cursos.canvas.uc.cl/courses/91056/files/13041851/preview" alt="class_icon.png" width="60px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13041851" data-api-returntype="File" /></div>
+<div>
+<table style="width: 100%;">
+<tbody>
+<tr>
+<td width="100%"><strong style="color: gray;">Clase 5</strong></td>
+</tr>
+<tr>
+<td><span style="color: #466e96; margin-top: 0.5em;">Semanas 5 y 6 (27-10). Fase 3 - Perspectiva empresarial (20 ptos)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div style="padding: 1em; border-top: solid 1px #D3D3D3;">
+<div><span style="color: #466e96;">5.1. <strong>Actividad.</strong> Perspectiva empresarial</span></div>
+<div style="display: flex; justify-content: space-between; margin-top: 5px;">
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="https://cursos.manthano.cl/curso/clase/tema/68c986670de42722523c2d09" target="_blank" rel="noopener"> <img id="13041991" src="https://cursos.canvas.uc.cl/courses/91056/files/13041991/preview" alt="diapo_icon.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13041991" data-api-returntype="File" /> </a>
+<div>Diapositiva</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042105" src="https://cursos.canvas.uc.cl/courses/91056/files/13042105/preview" alt="video_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042105" data-api-returntype="File" /> </a>
+<div>Video</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042106" src="https://cursos.canvas.uc.cl/courses/91056/files/13042106/preview" alt="quizz_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042106" data-api-returntype="File" /> </a>
+<div>Ejercicio</div>
+</div>
+</div>
+</div>
+<div style="padding: 1em; border-top: solid 1px #D3D3D3;">
+<div><span style="color: #466e96;">5.2. <strong>Rubrica de evaluaci&oacute;n</strong></span></div>
+<div style="display: flex; justify-content: space-between; margin-top: 5px;">
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="https://cursos.manthano.cl/curso/clase/tema/68c97aeb0de42722523c2a6d" target="_blank" rel="noopener"> <img id="13041991" src="https://cursos.canvas.uc.cl/courses/91056/files/13041991/preview" alt="diapo_icon.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13041991" data-api-returntype="File" /> </a>
+<div>Diapositiva</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042105" src="https://cursos.canvas.uc.cl/courses/91056/files/13042105/preview" alt="video_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042105" data-api-returntype="File" /> </a>
+<div>Video</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042106" src="https://cursos.canvas.uc.cl/courses/91056/files/13042106/preview" alt="quizz_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042106" data-api-returntype="File" /> </a>
+<div>Ejercicio</div>
+</div>
+</div>
+</div>
+</div>
+<div style="border: solid 1px #D3D3D3; border-radius: 10px; margin-bottom: 1.5em;">
+<div style="display: flex; gap: 10px; padding: 1em;">
+<div><img id="13041851" src="https://cursos.canvas.uc.cl/courses/91056/files/13041851/preview" alt="class_icon.png" width="60px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13041851" data-api-returntype="File" /></div>
+<div>
+<table style="width: 100%;">
+<tbody>
+<tr>
+<td width="100%"><strong style="color: gray;">Clase 6</strong></td>
+</tr>
+<tr>
+<td><span style="color: #466e96; margin-top: 0.5em;">Semana 7 (10-11). Fase 4 - P&oacute;ster final (8 ptos) \(\ast\) Reflexi&oacute;n final (8 ptos) \(\ast\) Encuesta de evaluaci&oacute;n - Final (4 ptos inicial+final)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div style="padding: 1em; border-top: solid 1px #D3D3D3;">
+<div><span style="color: #466e96;">6.1. <strong>Actividad.</strong> Poster final</span></div>
+<div style="display: flex; justify-content: space-between; margin-top: 5px;">
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="https://cursos.manthano.cl/curso/clase/tema/68c9866f0de42722523c2d14" target="_blank" rel="noopener"> <img id="13041991" src="https://cursos.canvas.uc.cl/courses/91056/files/13041991/preview" alt="diapo_icon.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13041991" data-api-returntype="File" /> </a>
+<div>Diapositiva</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042105" src="https://cursos.canvas.uc.cl/courses/91056/files/13042105/preview" alt="video_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042105" data-api-returntype="File" /> </a>
+<div>Video</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042106" src="https://cursos.canvas.uc.cl/courses/91056/files/13042106/preview" alt="quizz_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042106" data-api-returntype="File" /> </a>
+<div>Ejercicio</div>
+</div>
+</div>
+</div>
+<div style="padding: 1em; border-top: solid 1px #D3D3D3;">
+<div><span style="color: #466e96;">6.2. <strong>Actividad.</strong> Reflexi&oacute;n individual</span></div>
+<div style="display: flex; justify-content: space-between; margin-top: 5px;">
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="https://cursos.manthano.cl/curso/clase/tema/68c987640de42722523c2d70" target="_blank" rel="noopener"> <img id="13041991" src="https://cursos.canvas.uc.cl/courses/91056/files/13041991/preview" alt="diapo_icon.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13041991" data-api-returntype="File" /> </a>
+<div>Diapositiva</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042105" src="https://cursos.canvas.uc.cl/courses/91056/files/13042105/preview" alt="video_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042105" data-api-returntype="File" /> </a>
+<div>Video</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042106" src="https://cursos.canvas.uc.cl/courses/91056/files/13042106/preview" alt="quizz_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042106" data-api-returntype="File" /> </a>
+<div>Ejercicio</div>
+</div>
+</div>
+</div>
+<div style="padding: 1em; border-top: solid 1px #D3D3D3;">
+<div><span style="color: #466e96;">6.3. <strong>Actividad.</strong> Encuesta de evaluaci&oacute;n</span></div>
+<div style="display: flex; justify-content: space-between; margin-top: 5px;">
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="https://cursos.manthano.cl/curso/clase/tema/68d06e290bab5c704c7acc59" target="_blank" rel="noopener"> <img id="13041991" src="https://cursos.canvas.uc.cl/courses/91056/files/13041991/preview" alt="diapo_icon.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13041991" data-api-returntype="File" /> </a>
+<div>Diapositiva</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042105" src="https://cursos.canvas.uc.cl/courses/91056/files/13042105/preview" alt="video_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042105" data-api-returntype="File" /> </a>
+<div>Video</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042106" src="https://cursos.canvas.uc.cl/courses/91056/files/13042106/preview" alt="quizz_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042106" data-api-returntype="File" /> </a>
+<div>Ejercicio</div>
+</div>
+</div>
+</div>
+<div style="padding: 1em; border-top: solid 1px #D3D3D3;">
+<div><span style="color: #466e96;">6.4. <strong>Rubrica de evaluaci&oacute;n</strong></span></div>
+<div style="display: flex; justify-content: space-between; margin-top: 5px;">
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="https://cursos.manthano.cl/curso/clase/tema/68c97b540de42722523c2a91" target="_blank" rel="noopener"> <img id="13041991" src="https://cursos.canvas.uc.cl/courses/91056/files/13041991/preview" alt="diapo_icon.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13041991" data-api-returntype="File" /> </a>
+<div>Diapositiva</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042105" src="https://cursos.canvas.uc.cl/courses/91056/files/13042105/preview" alt="video_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042105" data-api-returntype="File" /> </a>
+<div>Video</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center;"><a class="btn inline_disabled disabled" style="border: solid 1px #D3D3D3; border-radius: 5px; padding: 5px;" href="#" target="_blank" rel="noopener"> <img id="13042106" src="https://cursos.canvas.uc.cl/courses/91056/files/13042106/preview" alt="quizz_class.png" width="20px" data-api-endpoint="https://cursos.canvas.uc.cl/api/v1/courses/91056/files/13042106" data-api-returntype="File" /> </a>
+<div>Ejercicio</div>
+</div>
+</div>
+</div>
+</div>
+</div>

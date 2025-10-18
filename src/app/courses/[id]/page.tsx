@@ -26,6 +26,7 @@ import {
 import { useCourseContent } from '@/lib/hooks/useCourseContent'
 import { useAuth } from '@/lib/stores/auth.store'
 import type { CapituloFiltrado } from '@/types/course-content.types'
+import { useCapitulosCurso } from '@/lib/hooks/useCapitulo'
 
 // ==========================================
 // 🎯 TIPOS
@@ -42,6 +43,10 @@ interface CoursePageProps {
 // ==========================================
 
 export default function CoursePage({ params }: CoursePageProps) {
+
+    // ==========================================
+    // 📊 ESTADO Y DATOS
+    // ==========================================
     const router = useRouter()
     const { user } = useAuth()
     const resolvedParams = use(params)
@@ -269,7 +274,8 @@ export default function CoursePage({ params }: CoursePageProps) {
                         <div className="space-y-8">
                             {capitulosFiltrados.map((capitulo, index) => (
                                 <ChapterTimelineCard
-                                    key={capitulo.id}
+                                    // key={capitulo.id}
+                                    key={index}
                                     capitulo={capitulo}
                                     index={index}
                                     onClick={() => handleChapterClick(capitulo)}
@@ -338,7 +344,6 @@ function ChapterTimelineCard({
     completedContentIds,
     isLocked
 }: ChapterTimelineCardProps) {
-
     // Calcular progreso
     const totalContenidos = capitulo.contenidosTotales
     const contenidosCompletadosCount = completedContentIds.filter(id =>
@@ -346,6 +351,7 @@ function ChapterTimelineCard({
             tema.contenidos.some(cont => cont.id === id)
         )
     ).length
+
     const progreso = totalContenidos > 0
         ? (contenidosCompletadosCount / totalContenidos) * 100
         : 0
