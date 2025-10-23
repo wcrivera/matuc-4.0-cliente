@@ -1,6 +1,7 @@
 // src/app/courses/[id]/chapters/[chapterId]/page.tsx
 // ==========================================
-// 📚 PÁGINA DE CAPÍTULO - MATUC v4
+// 📚 PÁGINA DE CAPÍTULO MEJORADA - MATUC v4
+// Sistema de Tabs: Clase | Ayudantía | Ejercicio
 // ==========================================
 
 'use client'
@@ -9,26 +10,28 @@ import { useState, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
+  ArrowLeft,
   BookOpen,
-  GraduationCap,
+  Users,
   ClipboardCheck,
+  Sparkles,
 } from 'lucide-react'
 
-// Componentes
-import ChapterHeader from '@/components/chapters/ChapterHeader'
-import ClassTab from '@/components/chapters/tabs/ClassTab'
-import WorkshopTab from '@/components/chapters/tabs/WorkshopTab'
-import EvaluationTab from '@/components/chapters/tabs/EvaluationTab'
-
-// Mock data
-import {
-  MOCK_CAPITULO_COMPLETO_ESTUDIANTE,
-} from '@/lib/mock/chapter-mock-data'
+// Tipos
 import type {
+  CapituloVistaCompleta,
   ContenidoFiltrado,
   EjercicioAyudantiaFiltrado,
   EjercicioEvaluacionEstudiante,
 } from '@/types/chapter.types'
+
+// Componentes de tabs
+import ClaseTab from '@/components/chapters/tabs/ClaseTab'
+import AyudantiaTab from '@/components/chapters/tabs/AyudantiaTab'
+import EjercicioTab from '@/components/chapters/tabs/EjercicioTab'
+
+// Mock data temporal
+import { MOCK_CAPITULO_COMPLETO_ESTUDIANTE } from '@/lib/mock/chapter-mock-data'
 
 // ==========================================
 // 🎯 TIPOS
@@ -41,7 +44,43 @@ interface ChapterPageProps {
   }>
 }
 
-type ActiveTab = 'clase' | 'ayudantia' | 'evaluacion'
+type TabType = 'clase' | 'ayudantia' | 'ejercicio'
+
+interface TabConfig {
+  id: TabType
+  label: string
+  icon: React.ReactNode
+  color: string
+  gradient: string
+}
+
+// ==========================================
+// 🎨 CONFIGURACIÓN DE TABS
+// ==========================================
+
+const TABS: TabConfig[] = [
+  {
+    id: 'clase',
+    label: 'Clase',
+    icon: <BookOpen className="w-5 h-5" />,
+    color: 'uc-azul',
+    gradient: 'from-uc-azul to-uc-celeste',
+  },
+  {
+    id: 'ayudantia',
+    label: 'Ayudantía',
+    icon: <Users className="w-5 h-5" />,
+    color: 'uc-celeste',
+    gradient: 'from-uc-celeste to-blue-400',
+  },
+  {
+    id: 'ejercicio',
+    label: 'Ejercicio',
+    icon: <ClipboardCheck className="w-5 h-5" />,
+    color: 'feedback-exito',
+    gradient: 'from-feedback-exito to-green-500',
+  },
+]
 
 // ==========================================
 // 🎓 COMPONENTE PRINCIPAL
@@ -52,31 +91,15 @@ export default function ChapterPage({ params }: ChapterPageProps) {
   const resolvedParams = use(params)
   const { id: courseId, chapterId } = resolvedParams
 
-  // Estados
-  const [activeTab, setActiveTab] = useState<ActiveTab>('clase')
+  // Estado del tab activo
+  const [activeTab, setActiveTab] = useState<TabType>('clase')
 
-  // Mock data (temporal - después será API call)
-  const data = MOCK_CAPITULO_COMPLETO_ESTUDIANTE
+  // Mock data (temporal - después será API call con chapterId)
+  const data: CapituloVistaCompleta = MOCK_CAPITULO_COMPLETO_ESTUDIANTE
   const { capitulo, ejerciciosAyudantia, ejerciciosEvaluacion, permisos, progreso } = data
 
-  // NUEVO: Nombre del curso (mock - después vendrá de la API)
-  const courseName = "MAT1610 - Cálculo I"
-
-  // ==========================================
-  // 🎨 ANIMACIONES
-  // ==========================================
-
-  const pageVariants = {
-    initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-    exit: { opacity: 0, y: -20, transition: { duration: 0.3 } },
-  }
-
-  const tabContentVariants = {
-    initial: { opacity: 0, x: 20 },
-    animate: { opacity: 1, x: 0, transition: { duration: 0.4 } },
-    exit: { opacity: 0, x: -20, transition: { duration: 0.3 } },
-  }
+  // TODO: Usar chapterId para obtener datos del backend
+  console.log('Chapter ID:', chapterId)
 
   // ==========================================
   // 🎯 HANDLERS
@@ -84,184 +107,160 @@ export default function ChapterPage({ params }: ChapterPageProps) {
 
   const handleContenidoClick = (contenido: ContenidoFiltrado) => {
     console.log('Contenido clicked:', contenido)
-    // TODO: Abrir modal o navegar a vista detallada
-  }
-
-  const handleToggleHabilitacion = async (contenidoId: string, habilitado: boolean) => {
-    console.log('Toggle habilitación contenido:', contenidoId, habilitado)
-    // TODO: API call para habilitar/deshabilitar
-  }
-
-  const handleEjercicioAyudantiaClick = (ejercicio: EjercicioAyudantiaFiltrado) => {
-    console.log('Ejercicio ayudantía clicked:', ejercicio)
-    // TODO: Abrir modal con ejercicio
-  }
-
-  const handleToggleHabilitacionAyudantia = async (ejercicioId: string, habilitado: boolean) => {
-    console.log('Toggle habilitación ayudantía:', ejercicioId, habilitado)
-    // TODO: API call
+    // TODO: Abrir modal de visualización
   }
 
   const handleEjercicioEvaluacionClick = (ejercicio: EjercicioEvaluacionEstudiante) => {
     console.log('Ejercicio evaluación clicked:', ejercicio)
-    // TODO: Abrir modal de detalles
-  }
-
-  const handleIniciarEvaluacion = (ejercicioId: string) => {
-    console.log('Iniciar evaluación:', ejercicioId)
     // TODO: Navegar a página de evaluación
-    router.push(`/courses/${courseId}/chapters/${chapterId}/evaluation/${ejercicioId}`)
   }
 
-  const handleToggleHabilitacionEvaluacion = async (ejercicioId: string, habilitado: boolean) => {
-    console.log('Toggle habilitación evaluación:', ejercicioId, habilitado)
-    // TODO: API call
+  const handleIniciarEvaluacion = async (ejercicioId: string) => {
+    console.log('Iniciar evaluación:', ejercicioId)
+    // TODO: Iniciar evaluación
   }
-
-  // Simular contenidos completados (estudiantes)
-  const completedContentIds = progreso
-    ? ['cont-001', 'cont-002', 'cont-005', 'cont-009']
-    : []
 
   // ==========================================
   // 🎨 RENDER
   // ==========================================
 
   return (
-    <motion.div
-      variants={pageVariants}
-      initial="initial"
-      animate="animate"
-      exit="exit"
-      className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30"
-    >
-      {/* Header del Capítulo */}
-      <ChapterHeader
-        capitulo={capitulo}
-        courseId={courseId}
-        permisos={permisos}
-        progreso={progreso}
-        onEdit={() => console.log('Editar capítulo')}
-        onSettings={() => console.log('Configurar capítulo')}
-        onViewStats={() => console.log('Ver estadísticas')}
-        onToggleVisibility={() => console.log('Toggle visibilidad')}
-      />
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-uc-celeste/5">
+      {/* Header compacto y elegante */}
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            {/* Breadcrumb y título */}
+            <div className="flex items-center gap-4">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => router.push(`/courses/${courseId}`)}
+                className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
+                aria-label="Volver al curso"
+              >
+                <ArrowLeft className="w-5 h-5 text-gray-600" />
+              </motion.button>
 
-      {/* Tabs Navigation - STICKY EN LA PARTE SUPERIOR */}
-      <div className="bg-white border-b-2 border-gray-200 sticky top-[73px] z-30 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-br from-uc-azul to-uc-celeste rounded-xl">
+                  <Sparkles className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-uc-azul">
+                    {capitulo.titulo}
+                  </h1>
+                  <p className="text-sm text-gray-500">
+                    {capitulo.temas.length} temas • {capitulo.contenidosTotales} contenidos
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Progreso (solo para estudiantes) */}
+            {progreso && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="hidden md:flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-uc-celeste/10 to-feedback-exito/10 rounded-xl border border-uc-celeste/20"
+              >
+                <div className="text-right">
+                  <p className="text-xs text-gray-500 font-medium">Progreso</p>
+                  <p className="text-lg font-bold text-uc-azul">
+                    {progreso.porcentajeProgreso.toFixed(0)}%
+                  </p>
+                </div>
+                <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progreso.porcentajeProgreso}%` }}
+                    transition={{ duration: 1, ease: 'easeOut' }}
+                    className="h-full bg-gradient-to-r from-uc-celeste to-feedback-exito"
+                  />
+                </div>
+              </motion.div>
+            )}
+          </div>
+        </div>
+      </header>
+
+      {/* Tabs de navegación - Estilo inspirado en tus imágenes */}
+      <div className="bg-gradient-to-r from-uc-azul via-uc-azul to-uc-celeste shadow-lg">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center gap-1">
-            <TabButton
-              active={activeTab === 'clase'}
-              onClick={() => setActiveTab('clase')}
-              icon={<BookOpen className="w-5 h-5" />}
-              label="Clase"
-              count={capitulo.temas.length}
-            />
-            <TabButton
-              active={activeTab === 'ayudantia'}
-              onClick={() => setActiveTab('ayudantia')}
-              icon={<GraduationCap className="w-5 h-5" />}
-              label="Ayudantía"
-              count={ejerciciosAyudantia.length}
-            />
-            <TabButton
-              active={activeTab === 'evaluacion'}
-              onClick={() => setActiveTab('evaluacion')}
-              icon={<ClipboardCheck className="w-5 h-5" />}
-              label="Evaluación"
-              count={ejerciciosEvaluacion.length}
-            />
+          <div className="flex gap-2 pt-4">
+            {TABS.map((tab) => {
+              const isActive = activeTab === tab.id
+
+              return (
+                <motion.button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  whileHover={{ y: isActive ? 0 : -2 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`
+                    relative flex items-center gap-2 px-6 py-3 rounded-t-2xl font-semibold
+                    transition-all duration-300
+                    ${isActive
+                      ? 'bg-white text-uc-azul shadow-lg'
+                      : 'bg-white/10 text-white/80 hover:bg-white/20'
+                    }
+                  `}
+                >
+                  {tab.icon}
+                  <span>{tab.label}</span>
+
+                  {/* Indicador activo */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeTab"
+                      className="absolute -bottom-0.5 left-0 right-0 h-1 bg-gradient-to-r from-uc-celeste to-feedback-exito rounded-full"
+                      transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                </motion.button>
+              )
+            })}
           </div>
         </div>
       </div>
 
       {/* Contenido de los tabs */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-7xl mx-auto px-6 py-8">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
-            variants={tabContentVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
           >
             {activeTab === 'clase' && (
-              <ClassTab
+              <ClaseTab
                 temas={capitulo.temas}
                 permisos={permisos}
-                completedContentIds={completedContentIds}
+                progreso={progreso}
                 onContenidoClick={handleContenidoClick}
-                onToggleHabilitacion={handleToggleHabilitacion}
               />
             )}
+
             {activeTab === 'ayudantia' && (
-              <WorkshopTab
+              <AyudantiaTab
                 ejercicios={ejerciciosAyudantia}
                 permisos={permisos}
-                onEjercicioClick={handleEjercicioAyudantiaClick}
-                onToggleHabilitacion={handleToggleHabilitacionAyudantia}
               />
             )}
-            {activeTab === 'evaluacion' && (
-              <EvaluationTab
+
+            {activeTab === 'ejercicio' && (
+              <EjercicioTab
                 ejercicios={ejerciciosEvaluacion}
                 permisos={permisos}
                 onEjercicioClick={handleEjercicioEvaluacionClick}
                 onIniciarEvaluacion={handleIniciarEvaluacion}
-                onToggleHabilitacion={handleToggleHabilitacionEvaluacion}
               />
             )}
           </motion.div>
         </AnimatePresence>
-      </div>
-    </motion.div>
-  )
-}
-
-// ==========================================
-// 🎨 COMPONENTE: TAB BUTTON
-// ==========================================
-
-interface TabButtonProps {
-  active: boolean
-  onClick: () => void
-  icon: React.ReactNode
-  label: string
-  count: number
-}
-
-function TabButton({ active, onClick, icon, label, count }: TabButtonProps) {
-  return (
-    <motion.button
-      whileHover={{ y: -1 }}
-      whileTap={{ scale: 0.98 }}
-      onClick={onClick}
-      className={`
-        relative flex items-center gap-2 px-5 py-3 font-semibold text-sm transition-all
-        ${active
-          ? 'text-uc-azul bg-uc-azul/5'
-          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-        }
-      `}
-    >
-      {icon}
-      <span>{label}</span>
-      <span
-        className={`
-        px-2 py-0.5 rounded-full text-xs font-bold
-        ${active ? 'bg-uc-azul text-white' : 'bg-gray-200 text-gray-700'}
-      `}
-      >
-        {count}
-      </span>
-      {active && (
-        <motion.div
-          layoutId="activeTab"
-          className="absolute bottom-0 left-0 right-0 h-1 bg-uc-azul rounded-t-lg"
-          transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-        />
-      )}
-    </motion.button>
+      </main>
+    </div>
   )
 }
